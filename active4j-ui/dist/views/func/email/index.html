@@ -1,0 +1,109 @@
+<title>邮件发送</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>常用功能</cite></a>
+    <a><cite>邮件发送</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">邮件发送</div>
+				<div class="layui-card-body" pad15>
+					<div class="layui-form" lay-filter="func-email-form">
+					
+						<div class="layui-form-item">
+							<label class="layui-form-label">收件人邮箱</label>
+							<div class="layui-input-inline" style="width: 300px">
+								<input type="text" name="mailbox" id="mailbox" lay-verify="required" placeholder="请输入收件人邮箱" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">主题</label>
+							<div class="layui-input-inline" style="width: 300px">
+								<input type="text" name="subject" id="subject" lay-verify="required" placeholder="请输入主题" autocomplete="off" class="layui-input">
+							</div>
+							<div class="layui-form-mid layui-word-aux">发送邮件的主题</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">内容</label>
+							<div class="layui-input-block" style="width: 600px;">
+								<textarea name="content" id="content" placeholder="请输入内容......" autocomplete="off"
+									class="layui-textarea"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<input type="button" class="layui-btn" lay-submit lay-filter="set_system_email" id="set_system_email" value="确认发送">
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script type="text/javascript">
+layui.use(['index', 'form', 'layedit', 'upload'], function(){
+    var admin = layui.admin;
+    var $ = layui.$;
+    var form = layui.form;
+	var layedit = layui.layedit;
+	var upload = layui.upload;
+	var setter = layui.setter;
+	
+	//插入图片接口
+	layedit.set({
+          //暴露layupload参数设置接口 --详细查看layupload参数说明
+          uploadImage: {
+              url: setter.baseUrl + '/func/upload/qcloudupload?access_token=' + layui.data(setter.tableName).access_token //接口url，这里使用了腾讯云上传方式
+              ,type: 'post' //默认post
+              ,accept: 'images' //允许上传的文件类型
+              ,acceptMime: 'image/*'
+              ,exts: 'jpg|png|gif|bmp|jpeg'	//允许上传的文件后缀。如果 accept 未设定，那么限制的就是图片的文件格式
+              ,size: '5120' //设置文件最大可允许上传的大小，单位 KB。不支持ie8/9
+          }
+	  });
+	
+	  //注意：layedit.set 一定要放在 build 前面，否则配置全局接口将无效。
+	  
+	  //建立编辑器
+	  var editIndex = layedit.build('content', {
+		  				height: 180 //设置编辑器高度
+					  });
+	  
+	  //监听提交
+	  form.on('submit(set_system_email)', function(data){
+		  var mailbox = $("#mailbox").val();
+		  var subject = $("#subject").val();
+		  var content = layedit.getContent(editIndex);
+		  
+	      admin.req({
+	      	type: "post",
+	        url: setter.baseUrl + '/sys/email/send',
+            data: {mailbox:mailbox,subject:subject,content:content},
+            done: function(res) {
+	    		if(res.success) {
+	    			CXL.success(res.msg);
+	    		}else {
+	    			CXL.warn(res.msg);
+	    		}
+	    	}
+	      });
+     
+	  });
+	
+	    
+});
+
+
+</script>

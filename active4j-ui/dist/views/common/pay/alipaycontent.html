@@ -1,0 +1,55 @@
+<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/pay/ali/getCharge?money={{layui.router().search.money}}&orderNo={{layui.router().search.orderNo}}">
+
+{{#   if(!d.success) {   }}
+
+<div class="layui-fluid">
+  <div class="layadmin-tips">
+    <i class="layui-icon" face>&#xe664;</i>
+    
+    <div class="layui-text" style="font-size: 20px;">
+      	好像出错了呢
+		<p style="font-size:14px; margin-top:5px;">{{d.msg}}</p>
+    </div>
+    
+  </div>
+</div>
+
+{{# }else {    }}
+
+{{d.data}}
+
+{{#   }        }}
+
+
+</script>
+
+<style>
+.layui-footer{
+	padding: 30px 0;
+    line-height: 30px;
+    text-align: center;
+    color: #666;
+    font-weight: 300;
+}
+</style>
+<div class="layui-footer footer footer-index">
+  <div class="layui-main">
+    <p>&copy; 2018 <a href="http://www.yunchaoyun.com/">yunchaoyun.com</a> 版权所有</p>
+    <p>
+      官方倾情出品
+    </p>
+  </div>
+</div> 
+
+
+<script type="text/javascript">
+	layui.use(['admin'], function() {
+		var $ = layui.$;
+		var admin = layui.admin;
+		var view = layui.view;
+		var setter = layui.setter;
+		var router = layui.router();
+		
+		
+	})
+</script>

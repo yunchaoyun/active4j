@@ -1,0 +1,25 @@
+<title>druid 监控</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>系统监控</cite></a>
+    <a><cite>druid 监控</cite></a>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+layui.use(['index', 'form'], function(){
+    var admin = layui.admin;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    var form = layui.form;
+
+    window.open(setter.baseUrl + "/druid/sql.html?access_token=" + layui.data(setter.tableName).access_token);
+    
+});
+
+
+</script>

@@ -1,0 +1,242 @@
+<title>服务器监控</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">主页</a>
+		<a><cite>系统监控</cite></a>
+		<a><cite>服务器监控</cite></a>
+	</div>
+</div>
+
+<div class="layui-fluid">
+    <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/monitor/server/index" lay-type="post">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-sm12 layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">CPU</div>
+				<div class="layui-card-body">
+					<table class="layui-table" lay-skin="line">
+						<thead>
+							<tr>
+								<th>属性</th>
+								<th>值</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>核心数</td>
+								<td>{{ d.data.cpu.cpuNum || '' }}</td>
+							</tr>
+							<tr>
+								<td>用户使用率</td>
+								<td id="cpuUsed">{{ d.data.cpu.used || '' }}%</td>
+							</tr>
+							<tr>
+								<td>系统使用率</td>
+								<td id="cpuSys">{{ d.data.cpu.sys || '' }}%</td>
+							</tr>
+							<tr>
+								<td>当前空闲率</td>
+								<td id="cpuFree">{{ d.data.cpu.free || '' }}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-sm12 layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">服务器信息</div>
+				<div class="layui-card-body">
+					<table class="layui-table" lay-skin="line">
+						<thead>
+							<tr>
+								<th>属性</th>
+								<th>内存</th>
+								<th>JVM</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>总内存</td>
+								<td>{{ d.data.mem.total || '' }}</td>
+								<td>{{ d.data.mem.jvmTotal || '' }}</td>
+							</tr>
+							<tr>
+								<td>已用内存</td>
+								<td id="memUsed">{{ d.data.mem.used || '' }}</td>
+								<td id="memJvmUsed">{{ d.data.mem.jvmUsed || '' }}</td>
+							</tr>
+							<tr>
+								<td>剩余内存</td>
+								<td id="memFree">{{ d.data.mem.free || '' }}</td>
+								<td id="memJvmFree">{{ d.data.mem.jvmFree || '' }}</td>
+							</tr>
+							<tr>
+								<td>使用率</td>
+								<td id="memUsage">{{ d.data.mem.usage || '' }}%</td>
+								<td id="memJvmUsage">{{ d.data.mem.jvmUsage || '' }}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-sm12 layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">JVM信息</div>
+				<div class="layui-card-body">
+					<table class="layui-table" lay-skin="line">
+						<colgroup>
+							<col width="150">
+							<col width="150">
+							<col>
+						</colgroup>
+						<tbody>
+							<tr>
+								<td>Java名称</td>
+								<td>{{ d.data.jvm.name || '' }}</td>
+							</tr>
+							<tr>
+								<td>Java版本</td>
+								<td>{{ d.data.jvm.version || '' }}</td>
+							</tr>
+							<tr>
+								<td>启动时间</td>
+								<td>{{ d.data.jvm.startTime || '' }}</td>
+							</tr>
+							<tr>
+								<td>运行时间</td>
+								<td>{{ d.data.jvm.runTime || '' }}</td>
+							</tr>
+							<tr>
+								<td>安装路径</td>
+								<td>{{ d.data.jvm.home || '' }}</td>
+							</tr>
+							<tr>
+								<td>项目路径</td>
+								<td>{{ d.data.jvm.userDir || '' }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-sm12 layui-col-md6">
+			<div class="layui-card">
+				<div class="layui-card-header">服务器信息</div>
+				<div class="layui-card-body">
+					<table class="layui-table" lay-skin="line">
+						<colgroup>
+							<col width="150">
+							<col width="150">
+							<col>
+						</colgroup>
+						<tbody>
+							<tr>
+								<td>名称</td>
+								<td>{{ d.data.sys.name || '' }}</td>
+							</tr>
+							<tr>
+								<td>生产商</td>
+								<td>{{ d.data.sys.productor || '' }}</td>
+							</tr>
+							<tr>
+								<td>内核</td>
+								<td>{{ d.data.sys.core || '' }}</td>
+							</tr>
+							<tr>
+								<td>逻辑处理器</td>
+								<td>{{ d.data.sys.cpus || '' }}</td>
+							</tr>
+							<tr>
+								<td>系统架构</td>
+								<td>{{ d.data.sys.structure || '' }}</td>
+							</tr>
+							<tr>
+								<td>操作系统</td>
+								<td>{{ d.data.sys.os || '' }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-sm12 layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">文件系统</div>
+				<div class="layui-card-body">
+					<table class="layui-table" lay-skin="line">
+						<thead>
+							<tr>
+								<th>盘符路径</th>
+								<th>文件系统</th>
+								<th>盘符类型</th>
+								<th>总大小</th>
+								<th>可用大小</th>
+								<th>已用大小</th>
+								<th>已用百分比</th>
+							</tr>
+						</thead>
+						<tbody>
+							{{#  layui.each(d.data.lstFileSys, function(index, item){ }}
+							<tr>
+								<td>{{ item.dirName }}</td>
+								<td>{{ item.sysTypeName }}</td>
+								<td>{{ item.typeName }}</td>
+								<td>{{ item.total }}</td>
+								<td>{{ item.free }}</td>
+								<td>{{ item.used }}</td>
+								 {{# if(item.usage > 80) { }}
+								<td style="color: red">
+								 {{ item.usage }}%</td>
+								 {{# } else{ }}
+								<td>{{ item.usage }}%</td>
+								 {{# } }}
+							</tr>
+							{{#  }); }}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</script>
+</div>
+<script type="text/javascript">
+
+layui.use(['admin', 'index'], function(){
+	var admin = layui.admin;
+    var $ = layui.$;
+    var setter = layui.setter;
+    
+	setInterval(function(){
+		admin.req({
+	      url: setter.baseUrl + '/monitor/server/server?access_token=' + layui.data(setter.tableName).access_token
+	      ,type: 'post'
+	      ,done: function(res){
+	      	if(res.success) {
+				$("#cpuUsed").html(res.data.cpu.used + '%');
+				$("#cpuSys").html(res.data.cpu.sys + '%');
+				$("#cpuFree").html(res.data.cpu.free + '%');
+				$("#memUsed").html(res.data.mem.used);
+				$("#memJvmUsed").html(res.data.mem.jvmUsed);
+				$("#memFree").html(res.data.mem.free);
+				$("#memJvmFree").html(res.data.mem.jvmFree);
+				$("#memUsage").html(res.data.mem.usage + '%');
+				$("#memJvmUsage").html(res.data.mem.jvmUsage + '%');
+	      	}
+	      }
+	    });
+	
+		
+	}, 5000);
+    
+});
+
+
+</script>

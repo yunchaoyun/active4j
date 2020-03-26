@@ -1,0 +1,35 @@
+  <div class="layui-form" lay-filter="active4j-sys-dic" id="active4j-sys-dic" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+    	<script type="text/html" template>
+        	<input type="hidden" name="id" value="{{ d.params.id || '' }}">
+      	</script>
+      <label class="layui-form-label">字典名称</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+        	<input type="text" name="name" value="{{ d.params.name || '' }}" lay-verify="required" placeholder="请输入数据字典名称"  autocomplete="off" class="layui-input">
+       </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">字典代码</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+        	<input type="text" name="code" value="{{ d.params.value || '' }}" lay-verify="required" placeholder="请输入数据字典代码""  autocomplete="off" class="layui-input">
+       </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+		<textarea name="memo" style="width: 400px; height: 150px;" autocomplete="off" class="layui-textarea">{{ d.params.memo || '' }}</textarea>
+       </script>
+      </div>
+    </div>
+    
+	<div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="sys-dic-save" id="sys-dic-save" value="保存">
+      <input type="button" lay-submit lay-filter="sys-dic-cancel" id="sys-dic-cancel" value="取消">
+    </div>
+  </div>
+ 

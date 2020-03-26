@@ -1,0 +1,102 @@
+<div class="layui-form" lay-filter="active4j-sys-role" style="padding: 20px 30px 0 0;">
+   	  <script type="text/html" template>
+        <input type="hidden" name="id" value="{{ d.params.id || '' }}">
+      </script>
+   <div class="layui-form-item">
+     <label class="layui-form-label">角色编号</label>
+     <div class="layui-input-inline">
+       <script type="text/html" template>
+        <input type="text" name="roleNo" value="{{ d.params.roleNo || '' }}" lay-verify="required" placeholder="请输入角色编号"  autocomplete="off" class="layui-input">
+       </script>
+     </div>
+   </div>
+   <div class="layui-form-item">
+     <label class="layui-form-label">角色名称</label>
+     <div class="layui-input-block">
+       <script type="text/html" template>
+        <input type="text" name="name" value="{{ d.params.name || '' }}" lay-verify="required" placeholder="请输入角色名称"  autocomplete="off" class="layui-input">
+       </script>
+     </div>
+   </div>
+   <div class="layui-form-item">
+   	<div class="layui-row">
+   		<div class="layui-col-xs7">
+   			<label class="layui-form-label">上级角色</label>
+		      <div class="layui-input-inline">
+		        <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/role/roleName?id={{d.params.parentId||''}}">
+					<input type="text" name="parentName" id="parentName" placeholder="请选择上级角色" autocomplete="off" class="layui-input"  value="{{ d.data.name||'' }}">
+					<input type="hidden" name="parentId" id="parentId" value="{{ d.params.parentId || '' }}">
+				</script>
+		      </div>
+   		</div>
+   		<div class="layui-col-xs5">
+			<button class="layui-btn layui-btn-sm" style="margin-top: 5px; margin-left: -15px;" id="selParentRole">请选择</button>
+		</div>
+   	</div>	
+     
+   </div>
+   
+   <div class="layui-form-item">
+     <label class="layui-form-label">排序</label>
+     <div class="layui-input-inline" style="width:80px;">
+       <script type="text/html" template>
+        <input type="text" name="orderNo" value="{{ d.params.orderNo || '' }}" placeholder="排序""  autocomplete="off" class="layui-input">
+       </script>
+     </div>
+   </div>
+   <div class="layui-form-item">
+     <label class="layui-form-label">备注</label>
+     <div class="layui-input-inline">
+       <script type="text/html" template>
+		<textarea name="memo" style="width: 400px; height: 150px;" autocomplete="off" class="layui-textarea">{{ d.params.memo || '' }}</textarea>
+       </script>
+     </div>
+   </div>
+  <div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="sys-role-save" id="sys-role-save" value="保存">
+      <input type="button" lay-submit lay-filter="sys-role-cancel" id="sys-role-cancel" value="取消">
+    </div>
+ </div>
+ 
+ <script type="text/javascript">
+	layui.use('dtree', function() {
+		var $ = layui.$;
+		var admin = layui.admin;
+		var view = layui.view;
+		var setter = layui.setter;
+		var dtree = layui.dtree;
+		var layer = layui.layer;
+		$("#selParentRole").click(function() {
+			admin.popup({
+				title : '选择角色',
+				area : [ '400px', '500px' ],
+				btn : [ '确定', '取消' ],
+				success: function(layero, index){
+		          view(this.id).render('common/selectrole').done(function(){
+		          
+		          	 var roleTree = dtree.render({
+					  elem: "#roleTree",
+					  url: setter.baseUrl + "/common/selectrole?access_token=" + layui.data(setter.tableName).access_token,
+					  dataStyle: "layuiStyle",  //使用layui风格的数据格式
+  					  dataFormat: "list",  //配置data的风格为list
+                      response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+                      icon:"2",
+                      dot:false
+					});
+					
+					$("#common-role-select").on("click", function() {
+						var param = dtree.getNowParam(roleTree);
+						$("#parentName").val(param.context);
+						$("#parentId").val(param.nodeId);
+						layer.close(index); //执行关闭 
+					})
+					
+		          });
+		        },
+		        yes : function(index, layero) {
+	    			$("#common-role-select").click();
+	    		}
+			});
+		});
+	})
+</script>

@@ -1,0 +1,31 @@
+ <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/dic/getDic?parentId={{d.params.parentId}}">
+ <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list" style="padding: 20px 30px 0 0;">
+  	<div class="layui-form-item">
+      <label class="layui-form-label">字典名称</label>
+      <div class="layui-input-inline">
+			<div class="layui-form-mid layui-word-aux">{{d.data.name}}</div>
+        	<input type="hidden" name="parentId" value="{{d.params.parentId}}">
+        	<input type="hidden" name="id" id="id" value="{{ d.params.id || '' }}">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">名称</label>
+      <div class="layui-input-inline">
+        	<input type="text" name="label" value="{{ d.params.name || '' }}" lay-verify="required" placeholder="请输入名称"  autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">值</label>
+      <div class="layui-input-inline">
+        	<input type="text" name="value" value="{{ d.params.value || '' }}" lay-verify="required" placeholder="请输入值"  autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    
+	<div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="sys-dic-save" id="sys-dic-save" value="保存">
+      <input type="button" lay-submit lay-filter="sys-dic-cancel" id="sys-dic-cancel" value="取消">
+    </div>
+  </div>
+
+</script>
+ 

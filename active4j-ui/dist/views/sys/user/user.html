@@ -1,0 +1,224 @@
+<div class="layui-form" lay-filter="active4j-sys-user" id="active4j-sys-user" style="padding: 20px 30px 0 0;">
+  	  <script type="text/html" template>
+        <input type="hidden" name="id" value="{{ d.params.id || '' }}">
+      </script>
+  	<div class="layui-form-item">
+      <label class="layui-form-label">用户编号</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="userNo" value="{{ d.params.userNo || '' }}" lay-verify="required" placeholder="请输入用户编号"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">用户名</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="userName" value="{{ d.params.userName || '' }}" lay-verify="required" placeholder="请输入用户名"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">姓名</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="realName" value="{{ d.params.realName || '' }}" lay-verify="required" placeholder="请输入姓名"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-inline">
+          <script type="text/html" template>
+					{{#  if(null == d.params.id || d.params.id == '') {    }}
+						<input type="checkbox" name="status" checked lay-skin="switch" lay-filter="status-switch" lay-text="正常|禁用">
+					{{#	}else {    }}
+						<input type="checkbox" name="status" {{d.params.status === '1' ? 'checked' : ''}} lay-skin="switch" lay-filter="status-switch" lay-text="正常|禁用">
+					{{#	}  }}
+         </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+    	<div class="layui-row">
+    		<div class="layui-col-xs8">
+    			<label class="layui-form-label">所属部门</label>
+			      <div class="layui-input-block">
+			        <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/dept/deptNameByUserId?userId={{d.params.id||''}}">
+						<input type="text" name="deptName" id="deptNameSelect" placeholder="请选择部门" autocomplete="off" class="layui-input" value="{{d.params.deptId || ''}}">
+						<input type="hidden" name="deptId" id="deptIdSelect" value="{{ d.data.id || '' }}">
+					</script>
+			      </div>
+    		</div>
+    		<div class="layui-col-xs4">
+				<button class="layui-btn layui-btn-sm" style="margin-top: 5px;" id="selectUserDept">请选择</button>
+			</div>
+    	</div>	
+    </div>
+    <div class="layui-form-item">
+    	<div class="layui-row">
+    		<div class="layui-col-xs8">
+    			<label class="layui-form-label">所属角色</label>
+			      <div class="layui-input-block">
+			      	<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/user/roleByUserId?userId={{d.params.id||''}}">
+							<input type="text" name="roleNames" id="roleNames" placeholder="请选择所属角色" autocomplete="off" class="layui-input" value="{{d.data.roleNames}}">
+			        		<input type="hidden" name="roleIds" id="roleIds" value="{{d.data.roleIds}}">
+					</script>
+			      </div>
+    		</div>
+    		<div class="layui-col-xs4">
+				<button class="layui-btn layui-btn-sm" style="margin-top: 5px;" id="selectRoles">请选择</button>
+			</div>
+    	</div>	
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">手机号</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="telNo" value="{{ d.params.telNo || '' }}" lay-verify="required|phone" placeholder="请输入手机号"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">邮箱</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="email" value="{{ d.params.email || '' }}" placeholder="请输入邮箱"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+	    <label class="layui-form-label">性别</label>
+	    <div class="layui-input-inline">
+	    	<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/common/sex/sexType" lay-done="layui.data.done(d);">
+				{{#  layui.each(d.data, function(index, item){ }}
+					{{#  if(null == d.params.id || d.params.id == '') {    }}
+						<input type="radio" name="sex" {{item.label === '男' ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}else {    }}
+						<input type="radio" name="sex" {{item.value === d.params.sex ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}  }}
+					
+				{{#  })    }}
+           </script>
+	    </div>
+	     <script>
+			layui.data.done = function(d){
+			  layui.use(['form'], function(){
+			    var form = layui.form;
+			    form.render('radio'); //渲染该模板下的动态表单
+			    form.render('checkbox');
+			  });
+			};
+	</script>
+	  </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+              <textarea name="memo" style="width: 400px; height: 100px;" autocomplete="off" class="layui-textarea">{{ d.params.memo || '' }}</textarea>
+        </script>
+      </div>
+    </div>
+    
+	<div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="sys-user-save" id="sys-user-save" value="保存">
+      <input type="button" lay-submit lay-filter="sys-user-cancel" id="sys-user-cancel" value="取消">
+    </div>
+  </div>
+  
+  <script type="text/javascript">
+	layui.use('dtree', function() {
+		var $ = layui.$;
+		var admin = layui.admin;
+		var view = layui.view;
+		var setter = layui.setter;
+		var dtree = layui.dtree;
+		var layer = layui.layer;
+		var form = layui.form;
+		
+		
+		//部门选择弹出框
+		$("#selectUserDept").click(function() {
+			admin.popup({
+				title : '选择部门',
+				area : [ '400px', '500px' ],
+				btn : [ '确定', '取消' ],
+				id : 'common-select-dept',
+				success: function(layero, index){
+		          view(this.id).render('common/selectdept').done(function(){
+		          
+		          	 var deptTree = dtree.render({
+					  elem: "#deptTree",
+					  url: setter.baseUrl + "/common/selectdept?access_token=" + layui.data(setter.tableName).access_token,
+					  dataStyle: "layuiStyle",  //使用layui风格的数据格式
+  					  dataFormat: "list",  //配置data的风格为list
+                      response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+                      icon:"2",
+                      dot:false
+					});
+					
+					$("#common-dept-select").on("click", function() {
+						var param = dtree.getNowParam(deptTree);
+						$("#deptNameSelect").val(param.context);
+						$("#deptIdSelect").val(param.nodeId);
+						layer.close(index); //执行关闭 
+					})
+					
+		          });
+		        },
+		        yes : function(index, layero) {
+	    			$("#common-dept-select").click();
+	    		}
+			});
+		});
+		
+		//角色选择弹出框
+		$("#selectRoles").click(function() {
+			admin.popup({
+				title : '选择角色',
+				area : [ '400px', '500px' ],
+				btn : [ '确定', '取消' ],
+				id : 'common-select-roles',
+				success: function(layero, index){
+		          view(this.id).render('common/selectroles').done(function(){
+		          
+		          	 var rolesTree = dtree.render({
+					  elem: "#rolesTree",
+					  url:setter.baseUrl + "/common/selectroles?access_token=" + layui.data(setter.tableName).access_token,
+					  dataStyle: "layuiStyle",  //使用layui风格的数据格式
+					  dataFormat: "list",  //配置data的风格为list
+					  response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+					  checkbar:true, //开启复选框
+					  checkbarType:"self",
+					  dot:false
+					});
+					
+					$("#common-roles-select").on("click", function() {
+						var nodes = dtree.getCheckbarNodesParam(rolesTree);
+						if(nodes && nodes.length <= 0) {
+							layer.alert("请选择相关角色");
+							return;
+						}
+						
+						var texts = "";
+						var ids = "";
+						for(var i = 0; i < nodes.length; i++) {
+							var node = nodes[i];
+							texts = texts + node.context + ",";
+							ids = ids + node.nodeId + ",";
+						}
+						
+						$("#roleNames").val(texts);
+						$("#roleIds").val(ids);
+						layer.close(index); //执行关闭 
+						
+					})
+					
+		          });
+		        },
+		        yes : function(index, layero) {
+	    			$("#common-roles-select").click();
+	    		}
+			});
+		});
+	})
+</script>

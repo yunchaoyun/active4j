@@ -1,0 +1,114 @@
+<div class="layui-form" lay-filter="active4j-func-timer-job" style="padding: 20px 30px 0 0;">
+	<script type="text/html" template>
+        <input type="hidden" name="id" value="{{ d.params.id || '' }}">
+    </script>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务简称</label>
+		<div class="layui-input-inline">
+			<script type="text/html" template>
+        		<input type="text" name="shortName" value="{{ d.params.shortName || '' }}" lay-verify="required" maxlength="100" placeholder="请输入任务简称"  autocomplete="off" class="layui-input">
+       		</script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务分组</label>
+		<div class="layui-input-inline">
+			<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/jobgroup" lay-type="post" lay-done="layui.data.done(d);">
+          		<select name="jobGroup" id="jobGroup" class="layui-input">
+					<option value="">请选择</option>
+	            	{{#  layui.each(d.data, function(index, item){ }}
+						<option value={{item.value}} {{ d.params.jobGroup === item.label ? 'selected' : '' }}>{{item.label}}</option>
+					{{#  })    }}
+	        	</select>
+			</script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">调用参数</label>
+		<div class="layui-input-block">
+			<script type="text/html" template>
+        		<input type="text" name="invokeParams" value="{{ d.params.invokeParams || '' }}" lay-verify="required" maxlength="500" placeholder="请输入调用参数"  autocomplete="off" class="layui-input">
+       		</script>
+		</div>
+	</div>
+	<div class="layui-input-block">
+		<blockquote class="layui-elem-quote">
+			Bean调用示例：timerTask.taskParams('active4j')<br>
+			Class类调用示例：com.zhonghe.active4j.func.timer.task.TimerTask.taskParams('active4j')<br>
+			参数说明：支持字符串，布尔类型，长整型，浮点型，整型
+		</blockquote>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">cron表达式</label>
+		<div class="layui-input-block">
+			<script type="text/html" template>
+        		<input type="text" name="cronExpression" value="{{ d.params.cronExpression || '' }}" lay-verify="required" maxlength="200" placeholder="请输入cron表达式""  autocomplete="off" class="layui-input">
+       		</script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">执行策略</label>
+		<div class="layui-input-block">
+			<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/misfirepolicy" lay-done="layui.data.done(d);">
+				{{#  layui.each(d.data, function(index, item){ }}
+					{{#  if(null == d.params.id || d.params.id == '') {    }}
+						<input type="radio" name="misfirePolicy" {{item.value === '1' ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}else {    }}
+						<input type="radio" name="misfirePolicy" {{item.value === d.params.misfirePolicy ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}  }}
+				{{#  })    }}
+           </script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">并发执行</label>
+		<div class="layui-input-block">
+			<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/concurrentstatus" lay-done="layui.data.done(d);">
+				{{#  layui.each(d.data, function(index, item){ }}
+					{{#  if(null == d.params.id || d.params.id == '') {    }}
+						<input type="radio" name="concurrentStatus" {{item.value === '0' ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}else {    }}
+						<input type="radio" name="concurrentStatus" {{item.value === d.params.concurrentStatus ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}  }}
+				{{#  })    }}
+           </script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">状态</label>
+		<div class="layui-input-block">
+			<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/jobstatus" lay-done="layui.data.done(d);">
+				{{#  layui.each(d.data, function(index, item){ }}
+					{{#  if(d.params.jobStatus == '3') {    }}
+						<input type="radio" name="jobStatus" {{item.value === '3' ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}else {    }}
+						<input type="radio" name="jobStatus" {{item.value === '0' ? 'checked':''}} value="{{item.value}}" title="{{item.label}}">
+					{{#	}  }}
+				{{#  })    }}
+           </script>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务描述</label>
+		<div class="layui-input-inline">
+			<script type="text/html" template>
+				<textarea name="description" style="width: 580px; height: 100px;" maxlength="250" autocomplete="off" class="layui-textarea">{{ d.params.description || '' }}</textarea>
+       		</script>
+		</div>
+	</div>
+	
+	<script>
+		layui.data.done = function(d){
+			layui.use(['form'], function(){
+				var form = layui.form;
+			    form.render('select'); //渲染该模板下的动态表单
+			    form.render('radio'); //渲染该模板下的动态表单
+			});
+		};
+	</script>
+	
+	<div class="layui-form-item layui-hide">
+		<input type="button" lay-submit lay-filter="func-timer-job-save" id="func-timer-job-save" value="保存">
+		<input type="button" lay-submit lay-filter="func-timer-job-cancel" id="func-timer-job-cancel" value="取消">
+	</div>
+</div>

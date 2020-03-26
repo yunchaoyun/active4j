@@ -1,0 +1,165 @@
+<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/pay/wx/getCharge?money={{layui.router().search.money}}&orderNo={{layui.router().search.orderNo}}">
+
+{{#   if(!d.success) {   }}
+
+<div class="layui-fluid">
+  <div class="layadmin-tips">
+    <i class="layui-icon" face>&#xe664;</i>
+    
+    <div class="layui-text" style="font-size: 20px;">
+      	好像出错了呢
+		<p style="font-size:14px; margin-top:5px;">{{d.msg}}</p>
+    </div>
+    
+  </div>
+</div>
+
+{{# }else {    }}
+
+<div class="layui-fluid">
+ <div class="layui-row layui-col-space15">
+	<div class="layui-col-md2" style="margin-top:-10px; height:65px;"></div>
+    <div class="layui-col-md8" style="margin-top:-10px; height:65px;">
+      <div class="layui-card">
+      	<ul class="layui-nav" lay-filter="component-nav">
+            <li class="layui-nav-item"><a href="javascript:;" style="font-size: 20px;">云潮云</a></li>
+            <li class="layui-nav-item" style="font-weight: bold;"><a href="javascript:;">订单确认</a></li>
+            <li class="layui-nav-item" style="float: right;"><a href="javascript:;">账号：{{d.data.company || ''}}</a></li>
+          </ul>
+      </div>
+      </div>
+ </div>
+  <div class="layui-row layui-col-space15">
+  	<div class="layui-col-md2" style="margin-top:-12px;"></div>
+    <div class="layui-col-md8" style="margin-top:-12px;">
+      <div class="layui-card" id="weixin-pay-result">
+        <div class="layui-card-header" style="height: 35px;">确认支付</div>
+        <div class="layui-card-body" style="text-align: center;">
+        	<div class="layui-form">
+        		<div class="layui-form-item" style="margin-top:-12px">
+	            	<label class="layui-form-label">商品订单:</label>
+	            	<div class="layui-input-inline">
+	                	<div class="layui-form-mid">{{d.data.orderNo || ''}}</div>
+						<input type="hidden" name="orderNo" id="orderNo" value="{{d.data.orderNo}}">
+	            	</div>
+	          	</div>
+	          	<div class="layui-form-item" style="margin-top:-15px">
+	            	<label class="layui-form-label">商品名称:</label>
+	            	<div class="layui-input-inline">
+	                	<div class="layui-form-mid">{{d.data.name || ''}}</div>
+	            	</div>
+	          	</div>
+	          	<div class="layui-form-item" style="margin-top:-15px">
+	            	<label class="layui-form-label">购买时间:</label>
+	            	<div class="layui-input-inline">
+	                	<div class="layui-form-mid">{{d.data.orderTime || ''}}</div>
+	            	</div>
+	          	</div>
+	          	<div class="layui-form-item" style="margin-top:-15px">
+	            	<label class="layui-form-label">支付金额:</label>
+	            	<div class="layui-input-inline">
+	                	<div class="layui-form-mid" style="color: blue; font-size: 16px; font-weight: bold;">{{d.data.money}}元</div>
+	            	</div>
+	          	</div>
+	          	<div class="layui-form-item" style="margin-top:-10px;">
+	            	<label class="layui-form-label">支付方式:</label>
+	            	<div class="layui-input-inline">
+	                	<img style="width: 170px; height: 45px; margin-left: -30px; margin-top: -15px;" src="https://zh-res-1251505225.cos.ap-shanghai.myqcloud.com/resouces/wechat.png">
+	            	</div>
+	          	</div>
+	          	<hr>
+	          	<div class="layui-form-item" style="margin-top: 5px;">
+	          		<label class="layui-form-label"></label>
+	          		<div class="layui-input-inline">
+	                	<img style="width: 200px; height: 180px;" src="{{layui.setter.baseUrl}}/func/pay/wx/getQrcode?key={{d.data.codeUrl}}&access_token={{layui.data(layui.setter.tableName).access_token}}">
+	                	<div style="height: 30px;line-height: 30px;background-color: #00c800;font-size: 12px;color: #fff;text-align: center; margin-top: 10px;">请打开手机微信，扫一扫完成支付</div>
+	            	</div>
+	            	<div class="layui-input-inline">
+	                	<img style="width: 206px; height: 220px; margin-left: 50px; margin-top: -10px;" src="https://zh-res-1251505225.cos.ap-shanghai.myqcloud.com/resouces/ep_sys_wx_tip.jpg">
+	            	</div>
+	          	</div>
+        	</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#   }        }}
+
+
+</script>
+
+<style>
+.layui-footer{
+	padding: -25px 0;
+    line-height: 16px;
+    text-align: center;
+    color: #666;
+    font-weight: 300;
+}
+</style>
+<div class="layui-footer footer footer-index">
+  <div class="layui-main">
+    <p>&copy; 2019 <a href="http://www.yunchaoyun.com/">yunchaoyun.com</a> 版权所有</p>
+    <p>
+      官方倾情出品
+    </p>
+  </div>
+</div> 
+
+
+<script type="text/javascript">
+	layui.use(['admin'], function() {
+		var $ = layui.$;
+		var admin = layui.admin;
+		var view = layui.view;
+		var setter = layui.setter;
+		var router = layui.router();
+		
+		//轮训刷新，获取支付状态
+		var i = 0;
+		var timer = setInterval(function(){getPayStatus(timer);},3000);
+		function getPayStatus(timer) {
+			i++;
+			
+			if(i > 100) {
+				//清除
+				clearInterval(timer);
+				
+				//重新渲染，结果显示
+				view('weixin-pay-result').render('common/pay/wxpayresult').done(function() {
+					
+				});
+			}
+			//请求结果
+			var orderNo = $("#orderNo").val();
+			admin.req({
+			      url: setter.baseUrl + '/func/pay/wx/getStatus'
+			      ,type: 'post'
+			      ,data: {orderNo:orderNo}
+			      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+			      	if(res.success) {
+			      		//清除
+						clearInterval(timer);
+			      		
+			      		//赋值
+			      		var orderName = res.data.orderName;
+			      		var status = res.data.status;
+			      		var orderTime = res.data.orderTime;
+			      		var money = res.data.money;
+			      		var msg = res.data.msg;
+						
+						//重新渲染，结果显示
+						view('weixin-pay-result').render('common/pay/wxpayresult', {orderNo:orderNo, orderName:orderName, status:status, orderTime:orderTime, money:money, msg:msg}).done(function() {
+							
+						});
+			      	}
+			      }
+			});
+			
+		
+		}
+		
+	})
+</script>

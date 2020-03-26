@@ -1,0 +1,129 @@
+<div class="layui-form" lay-filter="active4j-sys-menu" id="active4j-sys-menu" style="padding: 20px 30px 0 0;">
+  	 <script type="text/html" template>
+        <input type="hidden" name="id" value="{{ d.params.id || '' }}">
+      </script>
+    <div class="layui-form-item">
+      <label class="layui-form-label">菜单名称</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+             <input type="text" name="name" value="{{ d.params.name || '' }}" lay-verify="required" placeholder="请输入菜单名称"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+    	<div class="layui-row">
+    		<div class="layui-col-xs7">
+    			<label class="layui-form-label">上级菜单</label>
+			      <div class="layui-input-inline">
+			        <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/menu/menuName?id={{d.params.parentId||''}}">
+						<input type="text" name="parentName" id="parentName" placeholder="请选择上级菜单" autocomplete="off" class="layui-input"  value="{{d.data.name||''}}">
+						<input type="hidden" name="parentId" id="parentId" value="{{ d.params.parentId || '' }}">
+					</script>
+			      </div>
+    		</div>
+    		<div class="layui-col-xs5">
+				<button class="layui-btn layui-btn-sm" style="margin-top: 5px; margin-left: -15px;" id="selParentMenu">请选择</button>
+			</div>
+    	</div>	
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">菜单类型</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/menu/menuType" lay-done="layui.data.done(d);">
+			<select name="type">
+				{{#  layui.each(d.data, function(index, item){ }}
+					<option value={{item.value}} {{ d.params.type === item.label ? 'selected' : '' }}>{{item.label}}</option>
+				{{#  })    }}
+        	</select>
+		</script>
+      </div>
+      <script>
+			layui.data.done = function(d){
+			  layui.use(['form'], function(){
+			    var form = layui.form;
+			    form.render('select'); //渲染该模板下的动态表单
+			  });
+			};
+	</script>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">菜单url</label>
+      <div class="layui-input-block">
+        <script type="text/html" template>
+             <input type="text" name="url" value="{{ d.params.url || '' }}" placeholder="请输入菜单url"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">菜单图标</label>
+      <div class="layui-input-block">
+      	<script type="text/html" template>
+             <input type="text" name="icon" value="{{ d.params.icon || '' }}" placeholder="请输入菜单图标"  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">排序</label>
+      <div class="layui-input-inline" style="width:80px;">
+        <script type="text/html" template>
+        	<input type="text" name="orderNo" value="{{ d.params.orderNo || '' }}" placeholder="排序""  autocomplete="off" class="layui-input">
+        </script>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+      <div class="layui-input-inline">
+        <script type="text/html" template>
+			<textarea name="memo" style="width: 400px; height: 150px;" autocomplete="off" class="layui-textarea">{{ d.params.memo || '' }}</textarea>
+        </script>
+      </div>
+    </div>
+    
+	<div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="sys-menu-save" id="sys-menu-save" value="保存">
+      <input type="button" lay-submit lay-filter="sys-menu-cancel" id="sys-menu-cancel" value="取消">
+    </div>
+  </div>
+  
+  <script type="text/javascript">
+	layui.use('dtree', function() {
+		var $ = layui.$;
+		var admin = layui.admin;
+		var view = layui.view;
+		var setter = layui.setter;
+		var dtree = layui.dtree;
+		var layer = layui.layer;
+		$("#selParentMenu").click(function() {
+			admin.popup({
+				title : '选择菜单',
+				area : [ '400px', '500px' ],
+				btn : [ '确定', '取消' ],
+				success: function(layero, index){
+		          view(this.id).render('common/selectmenu').done(function(){
+		          
+		          	 var menuTree = dtree.render({
+					  elem: "#menuTree",
+					  url: setter.baseUrl + "/common/selectmenu?access_token=" + layui.data(setter.tableName).access_token,
+					  dataStyle: "layuiStyle",  //使用layui风格的数据格式
+  					  dataFormat: "list",  //配置data的风格为list
+                      response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+                      dot:false,
+                      initLevel:1
+					});
+					
+					$("#common-menu-select").on("click", function() {
+						var param = dtree.getNowParam(menuTree);
+						$("#parentName").val(param.context);
+						$("#parentId").val(param.nodeId);
+						layer.close(index); //执行关闭 
+					})
+					
+		          });
+		        },
+		        yes : function(index, layero) {
+	    			$("#common-menu-select").click();
+	    		}
+			});
+		});
+	})
+</script>

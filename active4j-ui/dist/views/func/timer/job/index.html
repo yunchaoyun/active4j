@@ -1,0 +1,543 @@
+<title>定时任务</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>常用功能</cite></a>
+    <a><cite>定时任务</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">查询</div>
+				<div class="layui-card-body">
+					<div class="layui-form">
+						<div class="test-table-reload-btn" style="margin-bottom: 10px;">
+							任务简称：
+							<div class="layui-inline">
+								<input class="layui-input" name="shortName" id="shortName" autocomplete="off">
+							</div>
+							<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/jobgroup" lay-type="post" lay-done="layui.data.done(d);">
+          						任务分组：
+          						<div class="layui-input-inline">
+          							<select name="jobGroup" id="jobGroup" class="layui-input">
+										<option value="">请选择</option>
+	            						{{#  layui.each(d.data, function(index, item){ }}
+										<option value={{item.value}}>{{item.label}}</option>
+										{{#  })    }}
+	        						</select>
+          						</div>
+				  			</script>
+							<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/jobstatus" lay-type="post" lay-done="layui.data.done(d);">
+          						任务状态：
+          						<div class="layui-input-inline">
+          							<select name="jobStatus" id="jobStatus" class="layui-input">
+										<option value="">请选择</option>
+	            						{{#  layui.each(d.data, function(index, item){ }}
+										<option value={{item.value}}>{{item.label}}</option>
+										{{#  })    }}
+	        						</select>
+          						</div>
+				  			</script>
+							<script>
+								layui.data.done = function(d){
+			  						layui.use(['form'], function(){
+			    						var form = layui.form;
+			    						form.render('select'); //渲染该模板下的动态表单
+			  						});
+								};
+							</script>
+							<div class="layui-row" style="margin-top: 10px;">
+								<div class="layui-col-md2 layui-col-md-offset10">
+									<button id="btnSearch" class="layui-btn">搜索</button>
+									<button id="btnReset" class="layui-btn">重置</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<table class="layui-hide" id="timer-job-table" lay-filter="timer-job-table"></table>
+					<!-- 头部工具栏 -->
+					<script type="text/html" id="timer-job-toolbar">
+              			<div class="layui-btn-container">
+                			<button class="layui-btn layui-btn-sm" lay-event="add">新增</button>
+                			<button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del">删除</button>
+                			<button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="log">日志</button>
+              			</div>
+            		</script>
+					<!-- 表格操作按钮 -->
+					<script type="text/html" id="timer-job-tool">
+						<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+						<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+						<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="one">执行一次</a>
+            		</script>
+					<script type="text/html" id="switchTpl">
+         				<input type="checkbox" name="jobStatus" value="{{d.id}}" lay-skin="switch" lay-text="启用|暂停" lay-filter="doRun" {{ d.jobStatus == '3' ? '' : 'checked' }}>
+        			</script>
+	        		<script type="text/html" id="timer-job-execute-status">
+         				{{#  if(d.jobExecuteStatus == '0'){ }}
+            				<span class="layui-badge layui-bg-gray">就绪</span>
+						{{#  } else if(d.jobExecuteStatus == '1'){ }}
+            				<span class="layui-badge layui-bg-blue">正在执行</span>
+						{{#  } else if(d.jobExecuteStatus == '2'){ }}
+							<span class="layui-badge layui-bg-green">完成</span>
+						{{#  } else if(d.jobExecuteStatus == '3'){ }}
+							<span class="layui-badge layui-bg-orange">暂停</span>
+						{{#  } else { }}
+            				<span class="layui-badge layui-bg-red">异常</span>
+          				{{#  } }}
+        			</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+layui.use(['index', 'table', 'form'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var form = layui.form;
+    var view = layui.view;
+    
+     /**
+     * 表格参数
+     */
+    var Page = {
+        tableId: 'timer-job-table',
+    	url: setter.baseUrl + '/func/timer/job/datagrid',
+    	toolbar:'#timer-job-toolbar',
+    	where:{field:'createDate', order:'desc'},
+    	initColumn: function() {
+    		return [[
+    			    {type: 'numbers'}
+    				,{type: 'checkbox'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'shortName', title: '任务简称', width:150}
+    		        ,{field:'jobGroup',title: '任务分组', width:100}
+    		        ,{field:'invokeParams',title: '调用参数', width:200}
+    		        ,{field:'cronExpression',title: '执行表达式', width:120}
+    		        ,{field:'jobStatus',title: '状态', width:100, templet: '#switchTpl', unresize: true}
+    		        ,{field:'jobExecuteStatus',title: '执行状态', width:100, templet: '#timer-job-execute-status'}
+    		        ,{field:'createDate',title: '创建时间', width:160, templet: '<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>'}
+    		        ,{fixed: 'right', title:'操作', toolbar: '#timer-job-tool', width:200}
+    			]];	 
+    	},
+    	saveUrl: setter.baseUrl + "/func/timer/job/save",
+    	delUrl: setter.baseUrl + "/func/timer/job/del",
+    	oneUrl: setter.baseUrl + "/func/timer/job/one"
+    	
+    };
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+         var queryData = {};
+    	 //查询字段
+         queryData['shortName'] = $("#shortName").val();
+         queryData['jobGroup'] = $("#jobGroup").val();
+         queryData['jobStatus'] = $("#jobStatus").val();
+         //排序字段
+         queryData['field'] = 'createDate';
+         queryData['order'] = 'desc';
+         
+         table.reload(Page.tableId, {where: queryData});
+    }
+    
+    
+    
+    /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 监听任务状态操作
+     */
+    form.on('switch(doRun)', function(obj) {
+    	//开关是否开启，true或者false
+    	var checked = obj.elem.checked;
+    	//如果是启用状态
+    	if(checked) {
+    		layer.open({
+			  content: '确定要启用任务吗？'
+			  ,btn: ['确定', '取消']
+			  ,yes: function(index, layero) {
+			  	var loading = layer.load(0, {
+                    shade: false,
+                });
+    			//请求后端
+    			admin.req({
+     	             type: "post",
+     	             url: setter.baseUrl + "/func/timer/job/start",
+     	             data: {id:obj.value},
+     	             done: function(res) {
+     	            	layer.close(loading);
+     		    		 if(res.success) {
+     		    			 CXL.success(res.msg);
+     		    			 //刷新表格
+    		                 Page.searchAction();
+     		    		 }else {
+     		    			 CXL.warn(res.msg);
+     		    			 obj.elem.checked = !checked;
+     		    			 //重载表单
+     		    			 form.render();
+     		    		 }
+     		    	 }
+     	         });
+    			 layer.close(index);
+			  }
+			  ,btn2: function(index, layero) {
+				 // 按钮2的事件
+				 obj.elem.checked = !checked;
+	             form.render();
+	             layer.close(index);
+			  }
+			  ,cancel: function(index, layero) { 
+				 //右上角关闭回调
+				 obj.elem.checked = !checked;
+	             form.render();
+	             layer.close(index);
+			  }
+    		});
+    	}else {
+    		layer.open({
+  			  content: '确定要暂停任务吗？'
+  			  ,btn: ['确定', '取消']
+  			  ,yes: function(index, layero) {
+  				var loading = layer.load(0, {
+                    shade: false,
+                });
+        		//请求后端
+        		admin.req({
+    	             type: "post",
+    	             url: setter.baseUrl + "/func/timer/job/pause",
+    	             data: {id:obj.value},
+    	             done: function(res) {
+    	            	layer.close(loading);
+    		    		 if(res.success) {
+    		    			 CXL.success(res.msg);
+    		    			 //刷新表格
+    		                 Page.searchAction();
+    		    		 }else {
+    		    			 CXL.warn(res.msg);
+    		    			 obj.elem.checked = !checked;
+    		    			 //重载表单
+     		    			 form.render();
+    		    		 }
+    		    	 }
+    	         });
+        		 layer.close(index);
+  			  }
+  			  ,btn2: function(index, layero) {
+  				 // 按钮2的事件
+  				 obj.elem.checked = !checked;
+                 form.render();
+                 layer.close(index);
+  			  }
+  			  ,cancel: function(index, layero) { 
+  				 //右上角关闭回调
+  				 obj.elem.checked = !checked;
+                 form.render();
+                 layer.close(index);
+  			  }
+    		});
+    	}
+    });
+    
+    /**
+     * 新增
+     */
+    Page.openAdd = function () {
+    	 admin.popup({
+    		title : '新增',
+    		id: 'active4j-func-timer-job',
+    		area: ['700px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('func/timer/job/job').done(function(){
+	            form.render(null, 'active4j-func-timer-job');
+	            
+	            //监听提交
+	            form.on('submit(func-timer-job-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: Page.saveUrl
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#func-timer-job-save").click();
+    		}
+    	});
+    };
+    
+    /**
+     * 编辑
+     */
+    Page.openEdit = function (data) {
+    	admin.popup({
+    		title : '编辑',
+    		id: 'active4j-func-tiemr-job',
+    		area: ['700px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('func/timer/job/job', data).done(function(){
+	            form.render(null, 'active4j-func-timer-job');
+	            
+	            //监听提交
+	            form.on('submit(func-timer-job-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: Page.saveUrl
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#func-timer-job-save").click();
+    		}
+    	});
+    };
+    
+    /**
+     * 查看
+     */
+    Page.openDetail = function(data) {
+    	admin.popup({
+    		title : '查看',
+    		id: 'active4j-func-timer-job-detail',
+    		area: ['700px', '700px'],
+    		success: function(layero, index){
+	          view(this.id).render('func/timer/job/detail', data).done(function(){
+	            form.render(null, 'active4j-func-timer-job-detail');
+	          });
+	        }
+    	});
+    }
+    
+    /**
+     * 执行一次
+     */
+    Page.doOne = function(data) {
+    	parent.layer.confirm('真的确定要立即执行一次任务么', function(index){
+    		var loading = layer.load(0, {
+                shade: false,
+            });
+    		
+    	  //提交 Ajax进行后端执行
+  	      admin.req({
+  	             type: "post",
+  	             url: Page.oneUrl,
+  	             data: {id:data.id},
+  	             done: function(res) {
+  	            	layer.close(loading);
+  		    		 if(res.success) {
+  		    			 CXL.success(res.msg);
+  		    			//刷新表格
+  		                Page.searchAction();
+  		    		 }else {
+  		    			 CXL.warn(res.msg);
+  		    		 }
+  		    	 }
+  	         });
+        	
+          layer.close(index);
+        });
+    }
+    
+    /**
+     * 删除
+     */
+    Page.doDel = function(data) {
+    	if(data.length === 0) {
+    		  CXL.warn('请选择一条数据');
+    		  return;
+          }else {
+            var ids=[];
+            for (var i = 0; i < data.length; i++) {
+                ids += data[i].id + ',';
+          }
+            ids = ids.substr(0, ids.length-1);
+        }
+    	//弹出确认提示
+    	parent.layer.confirm('真的确定要删除选中的' + data.length + '条数据么，此操作会忽略正在执行的任务', function(index) {
+    		var loading = layer.load(0, {
+                shade: false,
+            });
+    		
+    	  //提交 Ajax进行后端删除
+  	      admin.req({
+  	             type: "post",
+  	             url: Page.delUrl,
+  	             data: {ids:ids},
+  	             done: function(res) {
+  	            	layer.close(loading);
+  		    		 if(res.success) {
+  		    			 CXL.success(res.msg);
+  		    			//刷新表格
+  		                Page.searchAction();
+  		    		 }else {
+  		    			 CXL.warn(res.msg);
+  		    		 }
+  		    	 }
+  	         });
+        	
+          layer.close(index);
+        });
+    }
+    
+    /**
+     * 跳转日志
+     */
+    Page.openLog = function() {
+    	location.hash = '/func/timer/joblog/index'; 
+    }
+    
+    
+    /**
+     * 表格渲染
+     */
+    table.render({
+       elem: '#' + Page.tableId
+      ,url: Page.url
+      ,height: 'full-180'
+      ,page: true
+      ,limit : 30
+      ,autoSort:false
+      ,toolbar: Page.toolbar
+      ,where: Page.where
+      ,defaultToolbar: []
+     
+      ,cols: Page.initColumn()
+    });
+    
+    /**
+     * 表头工具栏
+     */
+    table.on('toolbar(' + Page.tableId + ')', function(obj){
+      var checkStatus = table.checkStatus(obj.config.id)
+      ,data = checkStatus.data; //获取选中的数据
+      switch(obj.event){
+         case 'add':
+	    	  Page.openAdd();
+	      break;
+	      case 'del':
+	    	  Page.doDel(data);
+	      break;
+	      case 'log':
+	    	  Page.openLog();
+	      break;
+      };
+    });
+    
+    /**
+     * 监听表格工具事件
+     */
+    table.on('tool(' + Page.tableId + ')', function(obj){ 
+       //获得当前行数据
+      var data = obj.data;
+       //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      var layEvent = obj.event; 
+     
+      //查看操作
+      if(layEvent === 'detail'){
+    	  Page.openDetail(data);
+      } 
+      //编辑操作
+      else if(layEvent === 'edit'){
+          Page.openEdit(data);
+      }
+      //执行一次操作
+      else if(layEvent === 'one'){
+          Page.doOne(data);
+      }
+    });
+    
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+    
+    //监听行单击事件
+    table.on('row(' + Page.tableId + ')', function(obj){
+       Page.clickAction(obj);
+    });
+     
+    //监听行双击事件
+    table.on('rowDouble(' + Page.tableId + ')', function(obj){
+    	Page.doubleClickAction(obj);
+    });
+
+
+});
+
+
+</script>

@@ -1,0 +1,206 @@
+<title>日志管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>系统管理</cite></a>
+    <a><cite>日志管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">查询</div>
+				<div class="layui-card-body">
+					<div class="layui-form">
+						<div class="test-table-reload-btn" style="margin-bottom: 10px;">
+							用户名：
+							<div class="layui-inline">
+								<input class="layui-input" name="userName" id="userName" autocomplete="off">
+							</div>
+							姓名：
+							<div class="layui-inline">
+								<input class="layui-input" name="realName" id="realName" autocomplete="off">
+							</div>
+
+							<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/sys/log/logtype"
+								lay-type="post" lay-done="layui.data.done(d);">
+          							日志类型：
+          							<div class="layui-input-inline">
+          								<select name="type" id="type" class="layui-input">
+											<option value="">请选择</option>
+	            							{{#  layui.each(d.data, function(index, item){ }}
+											<option value={{item.value}}>{{item.label}}</option>
+											{{#  })    }}
+	        							</select>
+          							</div>
+				  			</script>
+							<script>
+								layui.data.done = function(d){
+			  						layui.use(['form'], function(){
+			    						var form = layui.form;
+			    						form.render('select'); //渲染该模板下的动态表单
+			  						});
+								};
+							</script>
+
+							操作时间：
+							<div class="layui-input-inline">
+								<input type="text" name="beginTime" id="beginTime" placeholder="请选择开始时间" autocomplete="off"
+									class="layui-input">
+							</div>
+							到：
+							<div class="layui-input-inline">
+								<input type="text" name="endTime" id="endTime" placeholder="请选择结束时间" autocomplete="off"
+									class="layui-input">
+							</div>
+
+							<div class="layui-row" style="margin-top: 10px;">
+								<div class="layui-col-md2 layui-col-md-offset10">
+									<button id="btnSearch" class="layui-btn">搜索</button>
+									<button id="btnReset" class="layui-btn">重置</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<table class="layui-hide" id="sys-log-table" lay-filter="sys-log-table"></table>
+					<!-- 头部工具栏 -->
+            		<script type="text/html" id="sys-log-toolbar">
+            		</script>
+            		<!-- 表格操作按钮 -->
+            		<script type="text/html" id="sys-log-tool">
+            		</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+layui.use(['index', 'table','form','laydate'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    var form = layui.form;
+    var laydate = layui.laydate;
+    var router = layui.router();
+    
+    //初始化查询条件的时间控件
+    laydate.render({ 
+	  elem: '#beginTime'
+	  ,type: 'datetime'
+	});
+    
+    laydate.render({ 
+  	  elem: '#endTime'
+  	  ,type: 'datetime'
+  	});
+    
+     /**
+     * 表格参数
+     */
+    var Page = {
+        tableId: 'sys-log-table',
+    	url: setter.baseUrl + '/sys/log/datagrid',
+    	where:{field:'operatorTime', order:'desc'},
+    	initColumn: function() {
+    		return [[
+					 {type: 'numbers'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'userName', title: '用户名', width:120}
+    		        ,{field:'name', title: '操作名称', width:120}
+    		        ,{field:'type', title: '日志类型', width:90}
+    		        ,{field:'operatorTime',title: '操作时间', width:180, templet: '<div>{{ layui.laytpl.toDateString(d.operatorTime) }}</div>'}
+    		        ,{field:'broswer', title: '浏览器类型', width:100}
+    		        ,{field:'ip', title: 'IP地址', width:100}
+    		        ,{field:'className', title: '操作类名', width:140}
+    		        ,{field:'methodName', title: '方法名', width:120}
+    		        ,{field:'params', title: '参数', width:260}
+    		        ,{field:'memo', title: '备注', width:120}    			
+    			]];	 
+    	}
+    	
+    };
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+    	var queryData = {};
+    	//查询字段
+         queryData['userName'] = $("#userName").val();
+         queryData['type'] = $("#type").val();
+         queryData['operatorTime_begin'] = $("#timeBegin").val();
+         queryData['operatorTime_end'] = $("#timeEnd").val();
+         //排序字段
+         queryData['field'] = 'operatorTime';
+         queryData['order'] = 'desc';
+         
+    	table.reload(Page.tableId, {where: queryData});
+    }
+    
+     /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 表格渲染
+     */
+    table.render({
+       elem: '#' + Page.tableId
+      ,url: Page.url
+      ,height: 'full-180'
+      ,skin: 'line' //行边框风格
+      ,page: true
+      ,limit : 30
+      ,autoSort:false
+      ,where: Page.where
+      ,defaultToolbar: []
+      ,cols: Page.initColumn()
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+   /**
+     * 重置按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+
+
+});
+
+
+
+
+
+
+</script>

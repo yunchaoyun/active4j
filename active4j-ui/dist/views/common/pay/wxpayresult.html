@@ -1,0 +1,67 @@
+<title>订单支付结果</title>
+
+<style>
+	.layui-form-item {
+		margin-bottom: 2px;
+	}
+</style>
+
+<div class="layui-card-header">支付结果</div>
+<div class="layui-card-body" style="min-height: 500px;">
+<script type="text/html" template>
+	<blockquote class="layui-elem-quote" style="min-height: 80px;">
+		{{# if(d.params.status){   }}
+			<p style="margin-top: 30px; ">
+				<i class="layui-icon layui-icon-ok-circle" style="font-size: 20px; color: #009688;"></i>
+				<span style="font-weight: bold; font-size: 16px;margin-left: 5px;">支付成功</span>
+			</p>
+		{{# }else {                       }}
+			<p style="margin-top: 30px; ">
+				<i class="layui-icon layui-icon-face-cry" style="font-size: 20px; color: #009688;"></i>
+				<span style="font-weight: bold; font-size: 16px;margin-left: 5px;">{{d.params.msg}}</span>
+			</p>
+		{{# }                             }}
+		
+		</blockquote>
+	<div class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品订单:</label>
+			<div class="layui-input-inline">
+				<div class="layui-form-mid">{{d.params.orderNo}}</div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品名称:</label>
+			<div class="layui-input-inline">
+				<div class="layui-form-mid">{{d.params.orderName}}</div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">购买时间:</label>
+			<div class="layui-input-inline">
+				<div class="layui-form-mid">{{d.params.orderTime}}</div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">支付金额:</label>
+			<div class="layui-input-inline">
+				<div class="layui-form-mid">{{d.params.money}}元</div>
+			</div>
+		</div>
+		<hr>
+	</div>
+	<div class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label" style="width: 350px; text-align: left; color: #888">若有疑问请与客服联系，我们将尽快为您提供服务。</label>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label" style="width: 350px; text-align: left; color: #888">客服电话：**********</label>
+		</div>
+	</div>
+	<div style="padding-top: 30px;">
+          <a  href="javascript:window.opener=null;window.close();" class="layui-btn layui-btn-primary layui-btn-sm">关闭</a>
+     </div>
+</script>
+</div>
+
+

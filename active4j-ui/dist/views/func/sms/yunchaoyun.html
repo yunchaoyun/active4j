@@ -1,0 +1,107 @@
+<title>云潮云短信服务</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>常用功能</cite></a>
+    <a><cite>短信服务</cite></a>
+    <a><cite>云潮云短信服务</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">云潮云短信参数配置</div>
+				<div class="layui-card-body" pad15>
+					<div class="layui-form" lay-filter="func-email-form">
+						<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/sms/yunchaoyun" lay-type="post">
+						<div class="layui-form-item">
+			              <label class="layui-form-label">apikey</label>
+			              <div class="layui-input-inline" style="width: 300px;">
+			                <input type="text" name="apiKey" value="{{ d.data.apiKey }}" readonly="readonly" lay-verify="required" class="layui-input">
+			              </div>
+			              <div class="layui-form-mid layui-word-aux">来自云潮云平台开发者中心</div>
+			            </div>
+			            <div class="layui-form-item">
+			              <label class="layui-form-label">apiToken</label>
+			              <div class="layui-input-inline" style="width: 300px;">
+			                <input type="password" name="apiToken" value="{{ d.data.apiToken }}" readonly="readonly" lay-verify="required" autocomplete="off" class="layui-input">
+			              </div>
+			              <div class="layui-form-mid layui-word-aux">来自云潮云平台开发者中心，注意保密</div>
+			            </div>
+			            <div class="layui-form-item">
+			              <label class="layui-form-label">短信签名</label>
+			              <div class="layui-input-inline" style="width: 300px;">
+			                <input type="text" name="smsSign" value="{{ d.data.smsSign }}" readonly="readonly" lay-verify="required" autocomplete="off" class="layui-input">
+			              </div>
+			              <div class="layui-form-mid layui-word-aux">短信签名 需要申请审核通过方可使用 </div>
+			            </div>
+			            <div class="layui-form-item">
+			              <label class="layui-form-label">短信模版号</label>
+			              <div class="layui-input-inline" style="width: 300px;">
+			                <input type="text" name="templateNo" value="{{ d.data.templateNo }}" readonly="readonly" lay-verify="required" autocomplete="off" class="layui-input">
+			              </div>
+			              <div class="layui-form-mid layui-word-aux">短信签名 需要申请审核通过方可使用 </div>
+			            </div>
+			            <div class="layui-form-item">
+			              <label class="layui-form-label">手机号</label>
+			              <div class="layui-input-inline" style="width: 300px;">
+			                <input type="tel" name="phoneNo" value="" lay-verify="required|phone" autocomplete="off" class="layui-input">
+			              </div>
+			              <div class="layui-form-mid layui-word-aux">短信接受手机号</div>
+			            </div>
+			            <div class="layui-form-item">
+			              <div class="layui-input-block">
+			                <input type="button" class="layui-btn" lay-submit lay-filter="set_funsms_yunchaoyun" id="set_funsms_yunchaoyun" value="发送短信">
+			              </div>
+			            </div>
+			            <blockquote class="layui-elem-quote">
+			            	此短信发送采用了云潮云短信服务平台，<a href="http://www.yunchaoyun.com" target="_blank" style="color: blue;">去官网</a><br/>
+			            	短信发送集成SDK参考, <a href="https://github.com/yunchaoyun/yunsms" target="_blank" style="color: blue;">github</a><br/>
+			            	使用时请将参数换成自己的
+			            </blockquote>
+
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script type="text/javascript">
+layui.use(['index', 'form'], function(){
+    var admin = layui.admin;
+    var $ = layui.$;
+    var form = layui.form;
+	var setter = layui.setter;
+	
+	//监听提交
+	form.on('submit(set_funsms_yunchaoyun)', function(data){
+		var field = data.field; //获取提交的字段
+ 
+		admin.req({
+    		type: "post",
+      		url: setter.baseUrl + '/func/sms/sendYunchaoyunSms',
+         	data: field,
+         	done: function(res) {
+  				if(res.success) {
+  					CXL.success(res.msg);
+  				}else {
+  					CXL.warn(res.msg);
+  				}
+  			}
+		});
+  
+	});
+	
+	    
+});
+
+
+</script>

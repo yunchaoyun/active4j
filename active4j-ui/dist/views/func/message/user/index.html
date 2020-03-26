@@ -1,0 +1,177 @@
+<title>消息中心</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>消息中心</cite></a>
+  </div>
+</div>
+
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-tab layui-tab-brief">
+					<ul class="layui-tab-title">
+						<li class="layui-this">全部消息</li>
+					</ul>
+					<div class="layui-tab-content">
+
+						<div class="layui-tab-item layui-show">
+							<div class="LAY-app-message-btns" style="margin-bottom: 10px;">
+								<button class="layui-btn layui-btn-primary layui-btn-sm" data-type="all" data-events="del">删除</button>
+								<button class="layui-btn layui-btn-primary layui-btn-sm" data-type="all" data-events="ready">标记已读</button>
+								<button class="layui-btn layui-btn-primary layui-btn-sm" data-type="all"
+									data-events="readyAll">全部已读</button>
+							</div>
+
+							<table id="LAY-app-message-all" lay-filter="LAY-app-message-all"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+layui.use(['index', 'table', 'util'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    
+    //区分各选项卡中的表格
+	  var tabs = {
+	    all: {
+	      text: '全部消息'
+	      ,id: 'LAY-app-message-all'
+	    }
+	  };
+	  
+	  
+	  //标题内容模板
+	  var tplTitle = function(d){
+		  if('0' == d.readStatus) {
+			  return "<a lay-href='/func/message/user/detail/id=" + d.id + "'>" + "<strong>" + d.title + '</strong>';
+		  }else {
+			  return "<a lay-href='/func/message/user/detail/id=" + d.id + "'>" + d.title;
+		  }
+	  };
+	  
+	  var tplType = function(d) {
+		  return '【' + d.type + "】";
+	  }
+	  
+	  //全部消息
+	  table.render({
+	    elem: '#LAY-app-message-all'
+	    ,url: setter.baseUrl + '/func/message/user/datagrid'
+	    ,page: true
+	    ,where:{field:'publicTime', order:'desc'}
+	    ,limit : 20
+	    ,height: 'full-240'
+	    ,cols: [[
+	      {type:'numbers'}
+	      ,{type: 'checkbox'}
+	      ,{field: 'title', title: '标题内容', minWidth: 300, templet: tplTitle}
+	      ,{field: 'type', title: '消息类型', width: 200, templet: tplType}
+	      ,{field: 'publicTime', title: '消息时间', width: 170, templet: '<div>{{ layui.util.timeAgo(d.publicTime) }}</div>'}
+	    ]]
+	    ,skin: 'line'
+	  });
+	  
+	  //事件处理
+	  var events = {
+	    del: function(othis, type){
+	      var thisTabs = tabs[type]
+	      ,checkStatus = table.checkStatus(thisTabs.id)
+	      ,data = checkStatus.data; //获得选中的数据
+	      if(data.length === 0) return CXL.warn('请先选择相关数据');
+
+	      layer.confirm('确定删除选中的数据吗？', function(index) {
+	    	//获取ids
+	    	var ids = CXL.getTextByJs(data);
+	    	//请求删除
+	    	admin.req({
+	    		type: "post",
+ 	            url: setter.baseUrl + '/func/message/user/delete',
+ 	            data: {ids:ids},
+ 	            done: function(res) {
+ 		    		if(res.success) {
+ 		    			CXL.success("删除成功");
+ 		    			//表格刷新
+ 		    			table.reload(thisTabs.id); //刷新表格
+ 		    		}else {
+ 		    			CXL.warn(res.msg);
+ 		    		}
+ 		    	}
+ 	        });
+	    	
+	    	layer.close(index);
+	      });
+	    }
+	    ,ready: function(othis, type){
+	    	var thisTabs = tabs[type]
+	    	,checkStatus = table.checkStatus(thisTabs.id)
+	    	,data = checkStatus.data; //获得选中的数据
+	    	if(data.length === 0) return CXL.warn('请先选择相关数据');
+	      	
+      	  	var ids = CXL.getTextByJs(data);
+      	  	admin.req({
+	    		type: "post",
+	            url: setter.baseUrl + '/func/message/user/read',
+	            data: {ids:ids},
+	            done: function(res) {
+		    		if(res.success) {
+		    			CXL.success("标记已读成功");
+		    			//表格刷新
+		    			table.reload(thisTabs.id); //刷新表格
+		    		}else {
+		    			CXL.warn(res.msg);
+		    		}
+		    	}
+	        });
+	    }
+	    ,readyAll: function(othis, type){
+	      var thisTabs = tabs[type];
+	      
+	      layer.confirm('确定要将所有的系统消息标记为已读吗？', function(index) {
+	    	  admin.req({
+	    		  type: "post",
+		          url: setter.baseUrl + '/func/message/user/readall',
+		          done: function(res) {
+		        	  if(res.success) {
+		        		  CXL.success("标记全部已读成功");
+			    		  //表格刷新
+			    		  table.reload(thisTabs.id); //刷新表格
+		        	  }else {
+		        		  CXL.warn(res.msg);
+			    	  }
+			      }
+		      });
+	    	  
+	    	  layer.close(index);
+	       });
+	    }
+	  };
+	  
+	  $('.LAY-app-message-btns .layui-btn').on('click', function(){
+	    var othis = $(this)
+	    ,thisEvent = othis.data('events')
+	    ,type = othis.data('type');
+	    events[thisEvent] && events[thisEvent].call(this, othis, type);
+	  });
+
+	  //消息详细
+	  window.msgDetail = function(data) {
+		location.hash = '/func/message/user/detail/id=' + data;
+	  }
+
+});
+
+
+</script>

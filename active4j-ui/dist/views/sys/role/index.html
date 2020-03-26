@@ -1,0 +1,427 @@
+<title>角色管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>系统管理</cite></a>
+    <a><cite>角色管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md8">
+        <div class="layui-card">
+          <div class="layui-card-header">查询</div>
+          <div class="layui-card-body">
+          
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+            	  角色编号：
+              <div class="layui-inline">
+                <input class="layui-input" name="roleNo" id="roleNo" autocomplete="off">
+              </div>
+              	角色名称：
+              <div class="layui-inline">
+                <input class="layui-input" name="name" id="name" autocomplete="off">
+              </div>
+              <button id="btnSearch" class="layui-btn">搜索</button>
+              <button id="btnReset" class="layui-btn">重置</button>
+              <input type="hidden" id="selectRoleId" name="selectRoleId">
+            </div>
+             
+            <table class="layui-hide" id="sys-role-table" lay-filter="sys-role-table"></table> 
+          	<!-- 头部工具栏 -->
+            <script type="text/html" id="sys-role-toolbar">
+              <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-sm" lay-event="doAdd">新增</button>
+              </div>
+            </script>
+            <!-- 表格操作按钮 -->
+            <script type="text/html" id="sys-role-tool">
+				<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+				<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+				<a class="layui-btn layui-btn-xs" lay-event="permission">设置权限</a>
+            </script>
+            
+          </div>
+        </div>
+      </div>
+       <div class="layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">资源权限</div>
+          <div class="layui-card-body">
+          	<div class="layui-btn-container">
+              <div class="layui-btn-group">
+                <button class="layui-btn" dtree-id="menuTree" dtree-menu="checkAll">全选</button>
+                <button class="layui-btn" dtree-id="menuTree" dtree-menu="unCheckAll">全不选</button>
+                <button class="layui-btn" dtree-id="menuTree" dtree-menu="moveDown">展开</button>
+                <button class="layui-btn" dtree-id="menuTree" dtree-menu="moveUp">收缩</button>
+                <button class="layui-btn" id="saveRoleMenu">保存</button>
+              </div>
+            </div>
+            <div>
+            	<ul id="menuTree" class="dtree" data-id="0"></ul>
+            </div>
+          </div>
+        </div>
+       </div>
+    </div>
+  </div>
+  
+<script type="text/javascript">
+
+layui.use(['index', 'table', 'treetable','form', 'dtree'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var treetable = layui.treetable;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    var form = layui.form;
+    var dtree = layui.dtree;
+    
+    /**
+     * 表格参数
+     */
+    var Page = {
+        tableId: 'sys-role-table',
+    	url: setter.baseUrl + '/sys/role/datagrid',
+    	toolbar:'#sys-role-toolbar',
+    	where:{field:'orderNo', order:'asc', 'access_token': layui.data(setter.tableName).access_token},
+    	initColumn: function() {
+    		return [[
+    			     {type: 'numbers'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'name', title: '角色名称', width:260}
+    		        ,{field:'roleNo', title: '角色编号', width:90}
+    		        ,{field:'orderNo', title: '排序', width:90}
+    		        ,{fixed: 'right', title:'操作', toolbar: '#sys-role-tool', width:270}
+    			]];	 
+    	},
+    	addUrl: setter.baseUrl + "/sys/role/add",
+    	deleteUrl : setter.baseUrl + "/sys/role/delete",
+    };
+    
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+    	 //查询字段
+        var roleNo = $("#roleNo").val();
+        var name = $("#name").val();
+        
+        generateTable({field:'orderNo', order:'asc', 'roleNo': roleNo, 'name' : name, 'access_token': layui.data(setter.tableName).access_token});
+    }
+    
+    /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+     /**
+     * 新增
+     */
+    Page.openAdd = function () {
+    	admin.popup({
+    		title : '新增',
+    		id: 'active4j-sys-role',
+    		area: ['650px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('sys/role/role').done(function(){
+	            form.render(null, 'active4j-sys-role');
+	            
+	            //监听提交
+	            form.on('submit(sys-role-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: setter.baseUrl + '/sys/role/save'
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#sys-role-save").click();
+    		}
+    	});
+    };
+    
+     /**
+     * 编辑
+     */
+    Page.openEdit = function (data) {
+    	admin.popup({
+    		title : '编辑',
+    		id: 'active4j-sys-role',
+    		area: ['650px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('sys/role/role', data).done(function(){
+	            form.render(null, 'active4j-sys-role');
+	            
+	            //监听提交
+	            form.on('submit(sys-role-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: setter.baseUrl + '/sys/role/save'
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#sys-role-save").click();
+    		}
+    	});
+    };
+    
+     /**
+     * 查看
+     */
+    Page.openDetail = function(data) {
+    	admin.popup({
+    		title : '查看',
+    		id: 'active4j-sys-role',
+    		area: ['650px', '700px'],
+    		success: function(layero, index){
+	          view(this.id).render('sys/role/role', data).done(function(){
+	            form.render(null, 'active4j-sys-role');
+	            
+	          });
+	        }
+    	});
+    }
+     /**
+     * 删除表格数据
+     */
+    Page.deleteAction = function(obj) {
+    	layer.confirm('真的确定要删除么', function(index){
+    		
+    	  //提交 Ajax进行后端删除
+  	       admin.req({
+  	       		type:"post",
+  	       		url:setter.baseUrl + '/sys/role/delete',
+  	       		data: {id:obj.data.id},
+  	       		done: function(res) {
+  		    		 if(res.success) {
+  		    			 CXL.success(res.msg);
+  		    			 //表格删除
+  		    			 obj.del();
+  		    		 }else {
+  		    			 CXL.warn(res.msg);
+  		    		 }
+  		    	 }
+  	       });
+        	
+          layer.close(index);
+        });
+    }
+    
+    /**
+     * 刷新表格
+     */
+    window.refresh = function() {
+    	 var roleNo = $("#roleNo").val();
+         var name = $("#name").val();
+         
+         generateTable({field:'orderNo', order:'asc', 'roleNo': roleNo, 'name' : name});
+    }
+    
+    /**
+     * 渲染表格的方法
+     */
+    var generateTable = function(where) {
+    	 /**
+         * 表格渲染
+         */
+        treetable.render({
+           elem: '#' + Page.tableId
+          ,url: Page.url
+          ,height: 'full-180'
+          ,treeColIndex: 2
+          ,treeSpid: -1
+          ,treeIdName: 'id'
+          ,treePidName: 'parentId'
+          ,page: false
+          ,autoSort:false
+          ,toolbar: Page.toolbar
+          ,where: where
+          ,defaultToolbar: []
+         
+          ,cols: Page.initColumn()
+        });
+    }
+    
+    //渲染表格
+    generateTable(Page.where);
+    
+    /**
+     * 表头工具栏
+     */
+    table.on('toolbar(' + Page.tableId + ')', function(obj){
+      var checkStatus = table.checkStatus(obj.config.id);
+      switch(obj.event){
+        case 'doAdd':
+        	Page.openAdd();
+        break;
+      };
+    });
+    
+    /**
+     * 监听表格工具事件
+     */
+    table.on('tool(' + Page.tableId + ')', function(obj){ 
+       //获得当前行数据
+      var data = obj.data;
+       //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      var layEvent = obj.event; 
+     
+      //查看操作
+      if(layEvent === 'detail'){
+    	  Page.openDetail(data);
+      } 
+      //删除操作
+      else if(layEvent === 'del'){
+          Page.deleteAction(obj);
+      } 
+      //编辑操作
+      else if(layEvent === 'edit'){
+    	  Page.openEdit(data);
+      }else if(layEvent === 'permission') {
+    	  Page.openPermission(data);
+      }
+    });
+    
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+    
+    //监听行单击事件
+    table.on('row(' + Page.tableId + ')', function(obj){
+       Page.clickAction(obj);
+    });
+     
+    //监听行双击事件
+    table.on('rowDouble(' + Page.tableId + ')', function(obj){
+    	Page.doubleClickAction(obj);
+    });
+    
+    /***************************************权限**************************************************/
+    /**
+     * 点击设置权限
+     */
+    Page.openPermission = function(data) {
+    	var roleId = data.id;
+    	//赋值
+    	$("#selectRoleId").val(roleId);
+    	
+		var menuTree = dtree.render({
+			elem: "#menuTree",
+		  	url: setter.baseUrl + "/sys/role/setMenu?roleId=" + roleId + "&access_token=" + layui.data(setter.tableName).access_token,
+		  	dataStyle: "layuiStyle",  //使用layui风格的数据格式
+		  	dataFormat: "list",  //配置data的风格为list
+	        response:{message:"msg",statusCode:0},  //修改response中返回数据的定义
+	        checkbar:true, //开启复选框
+	        dot:false,
+	        initLevel:1,
+	        menubar:true,
+	         menubarTips:{
+			    group:[] // 按钮组制空
+			  }
+		});
+		
+		$("#saveRoleMenu").on("click", function() {
+			var roleId = $("#selectRoleId").val();
+			if(null != roleId && "" != roleId) {
+				//获得所有被选中的节点数组
+			var nodes = dtree.getCheckbarNodesParam(menuTree);
+			if(nodes) {
+				var ids = "";
+				for(var i = 0; i < nodes.length; i++) {
+					var node = nodes[i];
+					ids = ids + node.nodeId + ",";
+				}
+				//请求后台数据
+		    	admin.req({
+		    		type:"post",
+		    		url : setter.baseUrl + '/sys/role/saverolemenu',
+		    		data: {roleId:roleId, roleMenuIds:ids},
+		    		success:function(res) {
+		    			if(res.success) {
+							CXL.success(res.msg);
+						}else{
+							CXL.warn(res.msg);
+						}
+		    		}
+		    	});
+			}
+				
+			}
+		
+		})
+    }
+    
+ });
+    
+</script>

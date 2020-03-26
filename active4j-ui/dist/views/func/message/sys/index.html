@@ -1,0 +1,413 @@
+<title>系统消息</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>常用功能</cite></a>
+    <a><cite>系统消息</cite></a>
+  </div>
+</div>
+
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">查询</div>
+				<div class="layui-card-body">
+					<div class="layui-form">
+						<div class="test-table-reload-btn" style="margin-bottom: 10px;">
+							消息标题：
+							<div class="layui-inline">
+								<input class="layui-input" name="title" id="title" autocomplete="off">
+							</div>
+							<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/message/sys/type" lay-type="post" lay-done="layui.data.done(d);">
+          						消息类型：
+          						<div class="layui-input-inline">
+          							<select name="type" id="type" class="layui-input">
+										<option value="">请选择</option>
+	            						{{#  layui.each(d.data, function(index, item){ }}
+										<option value={{item.value}}>{{item.label}}</option>
+										{{#  })    }}
+	        						</select>
+          						</div>
+				  			</script>
+				  			<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/message/sys/status" lay-type="post" lay-done="layui.data.done(d);">
+          						消息状态：
+          						<div class="layui-input-inline">
+          							<select name="status" id="status" class="layui-input">
+										<option value="">请选择</option>
+	            						{{#  layui.each(d.data, function(index, item){ }}
+										<option value={{item.value}}>{{item.label}}</option>
+										{{#  })    }}
+	        						</select>
+          						</div>
+				  			</script>
+				  			<script>
+								layui.data.done = function(d){
+			  						layui.use(['form'], function(){
+			    						var form = layui.form;
+			    						form.render('select'); //渲染该模板下的动态表单
+			  						});
+								};
+							</script>
+
+							<div class="layui-row" style="margin-top: 10px;">
+								<div class="layui-col-md2 layui-col-md-offset10">
+									<button id="btnSearch" class="layui-btn">搜索</button>
+									<button id="btnReset" class="layui-btn">重置</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<input type="hidden" id="clickValue" name="clickValue">
+					<table class="layui-hide" id="func-message-table" lay-filter="func-message-table"></table>
+					<!-- 头部工具栏 -->
+					<script type="text/html" id="func-message-toolbar">
+              			<div class="layui-btn-container">
+                			<button class="layui-btn layui-btn-sm" lay-event="doAdd">新增</button>
+ 							<button class="layui-btn layui-btn-sm" lay-event="doPublish">发布</button>
+              			</div>
+            		</script>
+					<!-- 表格操作按钮 -->
+					<script type="text/html" id="func-message-tool">
+						<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+						<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            		</script>
+					<script type="text/html" id="sys-message-status">
+         				{{#  if(d.status == '1'){ }}
+            				<span class="layui-badge layui-bg-green">已发布</span>
+						{{#  } else { }}
+            				<span class="layui-badge layui-bg-gray">草稿</span>
+          				{{#  } }}
+        			</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+layui.use(['index', 'table', 'form'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    var form = layui.form;
+    
+     /**
+     * 表格参数
+     */
+     var Page = {
+        tableId: 'func-message-table',
+    	url: setter.baseUrl + '/func/message/sys/datagrid',
+    	toolbar:'#func-message-toolbar',
+    	where:{field:'createDate', order:'desc'},
+    	initColumn: function() {
+    		return [[
+    			     {type: 'numbers'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'title', title: '消息标题', width:200}
+    		        ,{field:'content',title: '内容', width:300}
+    		        ,{field:'type',title: '消息类型', width:120}
+    		        ,{field:'status',title: '消息状态', width:120, templet: '#sys-message-status'}
+    		        ,{field:'publicTime',title: '发布时间', width:180, templet: '<div>{{ layui.laytpl.toDateStringNull(d.publicTime) }}</div>'}
+    		        ,{fixed: 'right', title:'操作', toolbar: '#func-message-tool', width:170}
+    			]];	 
+    	},
+    	addUrl: setter.baseUrl + "/func/message/sys/add",
+    	deleteUrl : setter.baseUrl + "/func/message/sys/delete",
+    	saveUrl : setter.baseUrl + "/func/message/sys/save"
+    	
+    };
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+         var queryData = {};
+    	 //查询字段
+         queryData['title'] = $("#title").val();
+         queryData['type'] = $("#type").val();
+         queryData['status'] = $("#status").val();
+         //排序字段
+         queryData['field'] = 'createDate';
+         queryData['order'] = 'desc';
+         
+         table.reload(Page.tableId, {where: queryData});
+    }
+    
+    
+    
+    /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	$("#clickValue").val(obj.data.id);
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 新增
+     */
+    Page.openAdd = function () {
+    	 admin.popup({
+    		title : '新增',
+    		id: 'active4j-func-message-sys',
+    		area: ['700px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('func/message/sys/add').done(function(){
+	            form.render(null, 'active4j-func-message-sys');
+	            
+	            //监听提交
+	            form.on('submit(func-message-sys-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: Page.saveUrl
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#func-message-sys-save").click();
+    		}
+    	});
+    };
+    
+    /**
+     * 编辑
+     */
+    Page.openEdit = function (data) {
+    	admin.popup({
+    		title : '编辑',
+    		id: 'active4j-func-message-sys',
+    		area: ['700px', '700px'],
+    		btn : [ '确定', '取消' ],
+    		success: function(layero, index){
+	          view(this.id).render('func/message/sys/add', data).done(function(){
+	            form.render(null, 'active4j-func-message-sys');
+	            
+	            //监听提交
+	            form.on('submit(func-message-sys-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: Page.saveUrl
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+    			$("#func-message-sys-save").click();
+    		}
+    	});
+    };
+    
+    /**
+     * 查看
+     */
+    Page.openDetail = function(data) {
+    	admin.popup({
+    		title : '查看',
+    		id: 'active4j-func-message-sys-detail',
+    		area: ['700px', '700px'],
+    		success: function(layero, index){
+	          view(this.id).render('func/message/sys/detail', data).done(function(){
+	            form.render(null, 'active4j-func-message-sys-detail');
+	          });
+	        }
+    	});
+    }
+    
+   	/**
+     * 删除表格数据
+     */
+    Page.deleteAction = function(obj) {
+    	layer.confirm('真的确定要删除么', function(index){
+    		
+    	  //提交 Ajax进行后端删除
+  	      admin.req({
+  	             type: "post",
+  	             url: Page.deleteUrl,
+  	             data: {id:obj.data.id},
+  	             done: function(res) {
+  		    		 if(res.success) {
+  		    			 CXL.success(res.msg);
+  		    			 //表格删除
+  		    			 obj.del();
+  		    		 }else {
+  		    			 CXL.warn(res.msg);
+  		    		 }
+  		    	 }
+  	         });
+        	
+          layer.close(index);
+        });
+    }
+    
+    /**
+     * 发布
+     */
+    Page.doPublish = function() {
+    	var id = $("#clickValue").val();
+    	if(null == id || "" == id) {
+    		CXL.warn("请选择消息");
+    		return;
+    	}
+    	parent.layer.confirm('真的确定要发布该消息么', function(index){
+      	  //提交 Ajax
+	      admin.req({
+	             type: "post",
+	             url: setter.baseUrl + "/func/message/sys/publish?id=" + id,
+	             done: function(res) {
+		    		 if(res.success) {
+		    			 CXL.success(res.msg);
+		    			 
+		    			//刷新表格
+		                 Page.searchAction();
+		    		 }else {
+		    			 CXL.warn(res.msg);
+		    		 }
+		    	 }
+	         });
+          	
+            layer.close(index);
+          });
+    }
+    
+    
+    /**
+     * 表格渲染
+     */
+    table.render({
+       elem: '#' + Page.tableId
+      ,url: Page.url
+      ,height: 'full-180'
+      ,page: true
+      ,limit : 30
+      ,autoSort:false
+      ,toolbar: Page.toolbar
+      ,where: Page.where
+      ,defaultToolbar: []
+     
+      ,cols: Page.initColumn()
+    });
+    
+    /**
+     * 表头工具栏
+     */
+    table.on('toolbar(' + Page.tableId + ')', function(obj){
+      switch(obj.event){
+          case 'doAdd':
+        	Page.openAdd();
+          break;
+          case 'doPublish':
+        	Page.doPublish();
+          break;
+      };
+    });
+    
+    /**
+     * 监听表格工具事件
+     */
+    table.on('tool(' + Page.tableId + ')', function(obj){ 
+       //获得当前行数据
+      var data = obj.data;
+       //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      var layEvent = obj.event; 
+     
+      //查看操作
+      if(layEvent === 'detail'){
+    	  Page.openDetail(data);
+      } 
+      //删除操作
+      else if(layEvent === 'del'){
+          Page.deleteAction(obj);
+      } 
+      //编辑操作
+      else if(layEvent === 'edit'){
+    	  Page.openEdit(data);
+      }
+    });
+    
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+    
+    //监听行单击事件
+    table.on('row(' + Page.tableId + ')', function(obj){
+       Page.clickAction(obj);
+    });
+     
+    //监听行双击事件
+    table.on('rowDouble(' + Page.tableId + ')', function(obj){
+    	Page.doubleClickAction(obj);
+    });
+
+
+});
+
+
+</script>

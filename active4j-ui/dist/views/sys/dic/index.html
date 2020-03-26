@@ -1,0 +1,463 @@
+<title>数据字典管理</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>系统管理</cite></a>
+    <a><cite>数据字典管理</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">查询</div>
+          <div class="layui-card-body">
+          
+            <div class="test-table-reload-btn" style="margin-bottom: 10px;">
+              	字典名称：
+              <div class="layui-inline">
+                <input class="layui-input" name="name" id="name" autocomplete="off">
+              </div>
+              <div class="layui-row" style="margin-top: 10px;">
+				<div class="layui-col-md2 layui-col-md-offset10">
+					<button id="btnSearch" class="layui-btn">搜索</button>
+					<button id="btnReset" class="layui-btn">重置</button>
+				</div>
+			  </div>
+            </div>
+             <input type="hidden" id="clickValue" name="clickValue">
+             <input type="hidden" id="parentValue" name="parentValue">
+            <table id="sys-dic-table" lay-filter="sys-dic-table"></table> 
+          	<!-- 头部工具栏 -->
+            <script type="text/html" id="sys-dic-toolbar">
+              <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-sm" lay-event="doAdd">新增字典</button>
+                <button class="layui-btn layui-btn-sm" lay-event="doAddValue">新增字典值</button>
+              </div>
+            </script>
+            <!-- 表格操作按钮 -->
+            <script type="text/html" id="sys-dic-tool">
+				<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+				<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+ </div>
+ 
+<script type="text/javascript">
+
+layui.use(['index', 'table', 'treetable','form'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var treetable = layui.treetable;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var view = layui.view;
+    var form = layui.form;
+    
+    /**
+     * 表格参数
+     */
+    var Page = {
+        tableId: 'sys-dic-table',
+    	url: setter.baseUrl + '/sys/dic/datagrid',
+    	toolbar:'#sys-dic-toolbar',
+    	where:{access_token: layui.data(setter.tableName).access_token},
+    	initColumn: function() {
+    		return [[
+    			     {type: 'numbers'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'name', title: '字典名称', width:200}
+    		        ,{field:'value',title: '部门编码', width:120}
+    		        ,{fixed: 'right', title:'操作', toolbar: '#sys-dic-tool', width:300}
+    			]];	 
+    	},
+    	addUrl: setter.baseUrl + "/sys/dic/add", 
+    	deleteUrl : setter.baseUrl + '/sys/dic/delete'
+    };
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+    	 //查询字段
+         var name = $("#name").val();
+         
+         generateTable({'name': name,'access_token': layui.data(setter.tableName).access_token});
+    }
+    
+    /**
+     * 刷新表格
+     */
+    window.refresh = function() {
+    	 Page.searchAction();
+    }
+    
+    /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	$("#clickValue").val(obj.data.id);
+    	$("#parentValue").val(obj.data.parentId);
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+    /**
+	 * 新增
+ 	*/
+	Page.openAdd = function () {
+		 admin.popup({
+			title : '新增',
+			id: 'active4j-sys-dic',
+			area: ['650px', '700px'],
+			btn : [ '确定', '取消' ],
+			success: function(layero, index){
+	          view(this.id).render('sys/dic/dic').done(function(){
+	            form.render(null, 'active4j-sys-dic');
+	            
+	            //监听提交
+	            form.on('submit(sys-dic-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: setter.baseUrl + '/sys/dic/save'
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+				$("#sys-dic-save").click();
+			}
+		});
+	};
+    
+	 /**
+    	 * 新增字典值
+     */
+    Page.openAddValue = function () {
+    	var id = $("#clickValue").val();
+    	var parentId = $("#parentValue").val();
+    	if(null == id || "" == id) {
+    		CXL.warn("请选择字典");
+    		return;
+    	}
+    	if("-1" != parentId) {
+    		CXL.warn("请选择字典添加值");
+    		return;
+    	}
+    	admin.popup({
+			title : '新增',
+			id: 'active4j-sys-dic',
+			area: ['650px', '700px'],
+			btn : [ '确定', '取消' ],
+			success: function(layero, index){
+	          view(this.id).render('sys/dic/dicval', {parentId:id}).done(function(){
+	            form.render(null, 'active4j-sys-dic');
+	            
+	            //监听提交
+	            form.on('submit(sys-dic-save)', function(data){
+	              var field = data.field; //获取提交的字段
+	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+	              
+	               admin.req({
+				      url: setter.baseUrl + '/sys/dic/saveval'
+				      ,type: 'post'
+				      ,data: field
+				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+				      	if(res.success) {
+				      		CXL.success(res.msg); 
+				      		 //刷新表格
+			                Page.searchAction();
+			                //执行关闭 
+				            layer.close(index); 
+				      	}else {
+				      		CXL.warn(res.msg);
+				      	}
+				      }
+				    });
+	             
+	            });
+	          });
+	        },
+	        yes : function(index, layero) {
+				$("#sys-dic-save").click();
+			}
+		});
+	 }
+	
+    /**
+     * 编辑
+     */
+    Page.openEdit = function (data) {
+    	if(data.parentId != '-1') {
+    		admin.popup({
+    			title : '编辑',
+    			id: 'active4j-sys-dic',
+    			area: ['650px', '700px'],
+    			btn : [ '确定', '取消' ],
+    			success: function(layero, index){
+    	          view(this.id).render('sys/dic/dicval', data).done(function(){
+    	            form.render(null, 'active4j-sys-dic');
+    	            
+    	            //监听提交
+    	            form.on('submit(sys-dic-save)', function(data){
+    	              var field = data.field; //获取提交的字段
+    	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+    	              
+    	               admin.req({
+    				      url: setter.baseUrl + '/sys/dic/saveval'
+    				      ,type: 'post'
+    				      ,data: field
+    				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+    				      	if(res.success) {
+    				      		CXL.success(res.msg); 
+    				      		 //刷新表格
+    			                Page.searchAction();
+    			                //执行关闭 
+    				            layer.close(index); 
+    				      	}else {
+    				      		CXL.warn(res.msg);
+    				      	}
+    				      }
+    				    });
+    	             
+    	            });
+    	          });
+    	        },
+    	        yes : function(index, layero) {
+    				$("#sys-dic-save").click();
+    			}
+    		});
+    	}else {
+    		admin.popup({
+    			title : '编辑',
+    			id: 'active4j-sys-dic',
+    			area: ['650px', '700px'],
+    			btn : [ '确定', '取消' ],
+    			success: function(layero, index){
+    	          view(this.id).render('sys/dic/dic', data).done(function(){
+    	            form.render(null, 'active4j-sys-dic');
+    	            
+    	            //监听提交
+    	            form.on('submit(sys-dic-save)', function(data){
+    	              var field = data.field; //获取提交的字段
+    	              //提交 Ajax 成功后，关闭当前弹层并重载表格
+    	              
+    	               admin.req({
+    				      url: setter.baseUrl + '/sys/dic/save'
+    				      ,type: 'post'
+    				      ,data: field
+    				      ,done: function(res){ //这里要说明一下：done 是只有 response 的 code 正常才会执行。而 succese 则是只要 http 为 200 就会执行
+    				      	if(res.success) {
+    				      		CXL.success(res.msg); 
+    				      		 //刷新表格
+    			                Page.searchAction();
+    			                //执行关闭 
+    				            layer.close(index); 
+    				      	}else {
+    				      		CXL.warn(res.msg);
+    				      	}
+    				      }
+    				    });
+    	             
+    	            });
+    	          });
+    	        },
+    	        yes : function(index, layero) {
+    				$("#sys-dic-save").click();
+    			}
+    		});
+    	}
+    	
+    }
+    
+    
+    /**
+     * 查看
+     */
+    Page.openDetail = function(data) {
+    	if(data.parentId != '-1') {
+    		admin.popup({
+    			title : '查看',
+    			id: 'active4j-sys-dic',
+    			area: ['650px', '700px'],
+    			success: function(layero, index){
+    	          view(this.id).render('sys/dic/dicval', data).done(function(){
+    	            form.render(null, 'active4j-sys-dic');
+    	          });
+    	        }
+    		});
+    	}else {
+    		admin.popup({
+    			title : '查看',
+    			id: 'active4j-sys-dic',
+    			area: ['650px', '700px'],
+    			success: function(layero, index){
+    	          view(this.id).render('sys/dic/dic', data).done(function(){
+    	            form.render(null, 'active4j-sys-dic');
+    	          });
+    	        }
+    		});
+    	}
+    }
+    
+    /**
+    	 * 删除表格数据
+     */
+    Page.deleteAction = function(obj) {
+    	parent.layer.confirm('真的确定要删除么', function(index){
+    		
+    	  //提交 Ajax进行后端删除
+  	      admin.req({
+  	             type: "post",
+  	             url: Page.deleteUrl,
+  	             data: {id:obj.data.id, parentId:obj.data.parentId},
+  	             success: function(res) {
+  		    		 if(res.success) {
+  		    			 CXL.success(res.msg);
+  		    			 //表格删除
+  		    			 obj.del();
+  		    		 }else {
+  		    			 CXL.warn(res.msg);
+  		    		 }
+  		    	 }
+  	         });
+        	
+          layer.close(index);
+        });
+    }
+	
+    /**
+     * 渲染表格的方法
+     */
+    var generateTable = function(where) {
+    	 /**
+         * 表格渲染
+         */
+        treetable.render({
+           elem: '#' + Page.tableId
+          ,url: Page.url
+          ,height: 'full-180'
+          ,treeColIndex: 2
+          ,treeSpid: -1
+          ,treeIdName: 'id'
+          ,treePidName: 'parentId'
+          ,treeDefaultClose: true
+          ,page: false
+          ,autoSort:false
+          ,toolbar: Page.toolbar
+          ,where: where
+          ,defaultToolbar: []
+         
+          ,cols: Page.initColumn()
+        });
+    }
+    
+    //渲染表格
+    generateTable(Page.where);
+    
+    /**
+     * 表头工具栏
+     */
+    table.on('toolbar(' + Page.tableId + ')', function(obj){
+      var checkStatus = table.checkStatus(obj.config.id);
+      switch(obj.event){
+        case 'doAdd':
+        	Page.openAdd();
+        break;
+        case 'doAddValue':
+        	Page.openAddValue();
+        break;
+      };
+    });
+    
+    /**
+     * 监听表格工具事件
+     */
+    table.on('tool(' + Page.tableId + ')', function(obj){ 
+       //获得当前行数据
+      var data = obj.data;
+       //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      var layEvent = obj.event; 
+     
+      //查看操作
+      if(layEvent === 'detail'){
+    	  Page.openDetail(data);
+      } 
+      //删除操作
+      else if(layEvent === 'del'){
+          Page.deleteAction(obj);
+      } 
+      //编辑操作
+      else if(layEvent === 'edit'){
+    	  Page.openEdit(data);
+      }
+      
+    });
+    
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+    
+    //监听行单击事件
+    table.on('row(' + Page.tableId + ')', function(obj){
+       Page.clickAction(obj);
+    });
+     
+    //监听行双击事件
+    table.on('rowDouble(' + Page.tableId + ')', function(obj){
+    	Page.doubleClickAction(obj);
+    });
+	
+	
+	
+    
+  });
+
+
+</script>

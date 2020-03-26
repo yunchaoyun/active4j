@@ -1,0 +1,95 @@
+<title>验证码</title>
+
+<div class="layui-card layadmin-header">
+	<div class="layui-breadcrumb" lay-filter="breadcrumb">
+		<a lay-href="">主页</a>
+		<a><cite>常用功能</cite></a>
+		<a><cite>验证码</cite></a>
+	</div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">谷歌验证码</div>
+				<div class="layui-card-body">
+
+					<div class="layui-form" wid100 lay-filter="">
+						<div class="layui-form-item">
+							<div class="layui-row">
+								<div class="layui-col-xs1">
+									<input type="text" name="vercode" id="vercode" lay-verify="required" placeholder="验证码" autocomplete="off" class="layui-input">
+								</div>
+								<div class="layui-col-xs5">
+									<div style="margin-left: 10px;">
+										<script type="text/html" template>
+											<a href="javascript:void(0);" onclick="change();" title="点击更换验证码"> <img id="image" src="{{layui.setter.baseUrl}}/func/captcha/captchaImage?type=math" class="layadmin-user-login-codeimg" id="randCodeImage"></a>
+										</script>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="layui-form-item">
+							<button class="layui-btn" lay-submit lay-filter="form-btn-save" id="form-btn-save">验证</button>
+							<button class="layui-btn" id="mathBtn">更换算数验证码</button>
+							<button class="layui-btn" id="charBtn">更换字符验证码</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+layui.use(['index', 'form'], function(){
+    var admin = layui.admin;
+    var $ = layui.$;
+    var form = layui.form;
+	var setter = layui.setter;
+	
+	//改变验证码
+	  window.change = function() {
+		  document.getElementById("image").src = setter.baseUrl + '/func/captcha/captchaImage?type=math';
+	  }
+	  
+	  //监听提交
+	  form.on('submit(form-btn-save)', function(data){
+		  var field = data.field; //获取提交的字段
+	      var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引  
+	      //提交 Ajax 成功后，关闭当前弹层并重载表格
+	      $.ajax({
+			  type: "post",
+	          url: setter.baseUrl + '/func/captcha/verify',
+	          data: field,
+	          success: function(res) {
+	        	  if(res.success) {
+	        		  CXL.success("验证成功");
+		    	  }else {
+		    		  CXL.warn("验证失败");
+		    	  }
+		      }
+		  });
+	  });
+	  
+	  //点击算数验证码
+	  $('#mathBtn').click(function() {
+		  document.getElementById("image").src = setter.baseUrl + '/func/captcha/captchaImage?type=math';
+	  });
+	  
+	  //点击字符验证码
+	  $('#charBtn').click(function() {
+		  document.getElementById("image").src = setter.baseUrl + '/func/captcha/captchaImage?type=char';
+	  });
+	
+	
+	    
+});
+
+
+</script>

@@ -1,0 +1,277 @@
+<title>导入导出</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>常用功能</cite></a>
+    <a><cite>导入导出</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+	<div class="layui-row layui-col-space15">
+
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">excel导入</div>
+				<div class="layui-card-body">
+
+					<div class="layui-form" wid100 lay-filter="">
+						<div class="layui-form-item">
+							<div class="layui-input-inline">
+								<a class="layui-btn layui-btn-sm" href="https://zh-active4j-1251505225.cos.ap-shanghai.myqcloud.com/20191217/492c22873b8e4b79a7f3198f1cf318c3.xls">参考模版下载</a>
+								<button class="layui-btn layui-btn-sm" id="uploadBtn">导入</button>
+							</div>
+						</div>
+
+						<div class="layui-form-item">
+							<div class="layui-input-inline">
+								<textarea name="fielInput" id="fileInput" placeholder="支持excel(.xls,.xlsx)格式文件的导入" class="layui-textarea" readonly="readonly"></textarea>
+								<input type="hidden" name="fileKey" id="fileKey">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">查询</div>
+				<div class="layui-card-body">
+					<div class="layui-form">
+						<div class="test-table-reload-btn" style="margin-bottom: 10px;">
+							姓名：
+							<div class="layui-inline">
+								<input class="layui-input" name="name" id="name" autocomplete="off">
+							</div>
+							<div class="layui-row" style="margin-top: 10px;">
+								<div class="layui-col-md2 layui-col-md-offset10">
+									<button id="btnSearch" class="layui-btn">搜索</button>
+									<button id="btnReset" class="layui-btn">重置</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<input type="hidden" id="clickValue" name="clickValue">
+					<table class="layui-hide" id="func-export-table" lay-filter="func-export-table"></table>
+					<!-- 头部工具栏 -->
+					<script type="text/html" id="func-export-toolbar">
+              				<div class="layui-btn-container">
+								<button class="layui-btn layui-btn-sm" lay-event="xls">导出xls文件</button>
+								<button class="layui-btn layui-btn-sm" lay-event="xlsx">导出xlsx文件</button>
+								<button class="layui-btn layui-btn-sm" lay-event="csv">导出csv文件</button>
+              				</div>
+
+            			</script>
+					<!-- 表格操作按钮 -->
+					<script type="text/html" id="func-export-tool">
+							
+            		</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+layui.use(['index', 'table', 'upload'], function(){
+    var admin = layui.admin;
+    var table = layui.table;
+    var $ = layui.$;
+    var setter = layui.setter;
+    var upload = layui.upload;
+    
+    /**
+     * 表格参数
+     */
+    var Page = {
+        tableId: 'func-export-table',
+    	url: setter.baseUrl + '/func/export/datagrid',
+    	toolbar:'#func-export-toolbar',
+    	where:{field:'createDate', order:'desc'},
+    	initColumn: function() {
+    		return [[
+    			     {type: 'numbers'}
+    		        ,{field:'id', title: 'ID',hide:true, width:80}
+    		        ,{field:'name', title: '姓名', width:120}
+    		        ,{field:'sex', title: '性别', width:90}
+    		        ,{field:'age', title: '年龄', width:90}
+    		        ,{field:'phone', title: '手机号', width:160}
+    		        ,{field:'birthday',title: '生日', width:200, templet: '<div>{{ layui.laytpl.toDateStringNull(d.birthday) }}</div>'}
+    		        ,{field:'balance',title: '余额/元', width:120}
+    			]];	 
+    	}
+    };
+    
+    /**
+     * 页面查询
+     */
+    Page.searchAction = function() {
+         var queryData = {};
+    	 //查询字段
+         queryData['name'] = $("#name").val();
+         //排序字段
+         queryData['field'] = 'createDate';
+         queryData['order'] = 'desc';
+         
+         table.reload(Page.tableId, {where: queryData});
+    }
+    
+    
+    
+    /**
+     * 页面查询条件的重置
+     */
+    Page.resetAction = function() {
+    	$(".layui-input").val('');
+    	Page.searchAction();
+    }
+    
+    
+    /**
+     * 表格的单击事件
+     */
+    Page.clickAction = function(obj) {
+    	
+    }
+    
+    /**
+     * 表格的双击事件
+     */
+    Page.doubleClickAction = function(obj) {
+    	
+    }
+    
+    
+    //文件上传
+    var uploadInst = upload.render({
+	    elem: '#uploadBtn' //绑定元素
+	    ,url: setter.baseUrl + '/func/export/upload?access_token=' + layui.data(setter.tableName).access_token //上传接口
+	    ,size: 1024 //限定大小1M
+	    ,accept:'file'
+	    ,acceptMime:'application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+	    ,exts:"xls|xlsx"
+	    ,before:function(obj) {
+	    	var loading = layer.load(0, {
+	    		shade: false,
+	        });
+	    }
+	    ,done: function(res){
+	        layer.closeAll('loading'); //关闭loading
+	      //上传完毕回调
+	      if(res.success) {
+              Page.searchAction();
+	    	  CXL.success(res.msg);
+	    	  //赋值数据
+	    	  $("#fileInput").val(res.attributes.src);
+	    	  //刷新表格
+	      }else {
+	    	  CXL.warn(res.msg);
+	    	  $("#uploadBtn").html("重新上传");
+	      }
+	    }
+	    ,error: function(){
+	      layer.closeAll('loading'); //关闭loading
+	      $("#uploadBtn").html("重新上传");
+	    }
+    })
+    
+    //导出xlx文件，这里不能用ajax请求，ajax请求无法弹出下载保存对话框
+    Page.doXls = function() {
+    	var name = $("#name").val();
+    	location.href = setter.baseUrl + '/func/export/xls?name=' + name + '&access_token=' + layui.data(setter.tableName).access_token;
+    }
+    
+    //导出xlxs文件，这里不能用ajax请求，ajax请求无法弹出下载保存对话框
+    Page.doXlsx = function() {
+    	var name = $("#name").val();
+    	location.href = setter.baseUrl + '/func/export/xlsx?name=' + name + '&access_token=' + layui.data(setter.tableName).access_token;
+    }
+    
+    //导出csv文件，这里不能用ajax请求，ajax请求无法弹出下载保存对话框
+    Page.doCsv = function() {
+    	var name = $("#name").val();
+    	location.href = setter.baseUrl + '/func/export/csv?name=' + name + '&access_token=' + layui.data(setter.tableName).access_token;
+    }
+    
+    
+    /**
+     * 表格渲染
+     */
+    table.render({
+       elem: '#' + Page.tableId
+      ,url: Page.url
+      ,height: 'full-180'
+      ,page: true
+      ,limit : 30
+      ,autoSort:false
+      ,toolbar: Page.toolbar
+      ,where: Page.where
+      ,defaultToolbar: []
+     
+      ,cols: Page.initColumn()
+    });
+    
+    /**
+     * 表头工具栏
+     */
+    table.on('toolbar(' + Page.tableId + ')', function(obj){
+      var checkStatus = table.checkStatus(obj.config.id);
+      switch(obj.event){
+      	   case 'xls':
+        	   Page.doXls();
+           break;
+           case 'xlsx':
+        	   Page.doXlsx();
+           break;
+           case 'csv':
+               Page.doCsv();
+           break;
+      };
+    });
+    
+    /**
+     * 监听表格工具事件
+     */
+    table.on('tool(' + Page.tableId + ')', function(obj){ 
+       //获得当前行数据
+      var data = obj.data;
+       //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      var layEvent = obj.event; 
+     
+    });
+    
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnSearch').click(function () {
+    	Page.searchAction();
+    });
+    
+    /**
+     * 搜索按钮事件
+     */
+    $('#btnReset').click(function () {
+    	Page.resetAction();
+    });
+    
+    //监听行单击事件
+    table.on('row(' + Page.tableId + ')', function(obj){
+       Page.clickAction(obj);
+    });
+     
+    //监听行双击事件
+    table.on('rowDouble(' + Page.tableId + ')', function(obj){
+    	Page.doubleClickAction(obj);
+    });
+
+
+});
+
+
+
+</script>

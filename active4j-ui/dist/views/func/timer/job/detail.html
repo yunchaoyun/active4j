@@ -1,0 +1,66 @@
+<style type="text/css">
+.layui-form-label {
+	width: 120px;
+}
+</style>
+<div class="layui-form" lay-filter="active4j-func-timer-job-detail" style="padding: 20px 30px 0 0;">
+	<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/timer/job/detail?id={{ d.params.id }}" lay-type="post">
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务编号：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.jobNo || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务简称：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.shortName || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务分组：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.jobGroup || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">调用参数：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.invokeParams || '' }}</div>
+	</div>
+	<div class="layui-input-block">
+		<blockquote class="layui-elem-quote">
+			Bean调用示例：timerTask.taskParams('active4j')<br>
+			Class类调用示例：com.zhonghe.active4j.func.timer.task.TimerTask.taskParams('active4j')<br>
+			参数说明：支持字符串，布尔类型，长整型，浮点型，整型
+		</blockquote>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">cron表达式：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.cronExpression || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">执行策略：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.misfirePolicy || '' }}</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">并发执行：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.concurrentStatus || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">任务状态：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.jobStatus || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+      <label class="layui-form-label">执行状态：</label>
+      <div class="layui-form-mid layui-text">{{ d.data.jobExecuteStatus || '' }}</div>
+    </div>
+	<div class="layui-form-item">
+      <label class="layui-form-label">上一次执行时间：</label>
+      <div class="layui-form-mid layui-text">{{ d.data.previous || '' }}</div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">下一次执行时间：</label>
+      <div class="layui-form-mid layui-text">{{ d.data.next || '' }}</div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">任务描述：</label>
+      <div class="layui-input-inline">
+        <textarea name="description" readonly="readonly" style="width: 400px; height: 100px;" autocomplete="off" class="layui-textarea">{{ d.data.description || '' }}</textarea>
+      </div>
+    </div>
+	
+	</script>
+</div>

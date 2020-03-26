@@ -1,0 +1,35 @@
+<style type="text/css">
+.layui-form-label {
+	width: 120px;
+}
+</style>
+
+<div class="layui-form" lay-filter="active4j-func-message-sys-detail" style="padding: 20px 30px 0 0;">
+	<script type="text/html" template lay-url="{{layui.setter.baseUrl}}/func/message/sys/detail?id={{ d.params.id }}" lay-type="post">
+	<div class="layui-form-item">
+		<label class="layui-form-label">消息标题：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.title || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">消息内容：</label>
+		<div class="layui-input-inline">
+			<textarea name="content" readonly="readonly" style="width: 450px; height: 300px;" autocomplete="off" class="layui-textarea">{{ d.data.content || '' }}</textarea>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">消息类型：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.type || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">消息状态：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.status || '' }}</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">发布时间：</label>
+		<div class="layui-form-mid layui-text">{{ d.data.time || '' }}</div>
+	</div>
+
+	</script>
+
+</div>
+
