@@ -231,17 +231,20 @@ public class SysMenuController extends BaseController {
 	@RequestMapping(value="/list")
 	@ApiOperation(value = "获取权限菜单", notes = "获取权限菜单")
 	public void list(HttpServletRequest request, HttpServletResponse response) {
-		ActiveUser user = ShiroUtils.getSessionUser();
+		try {
+			ActiveUser user = ShiroUtils.getSessionUser();
+			
+			//缓存中不存在，重新查询
+			ResultJson result = new ResultJson();
+			List<MenuModel> lstModes = sysUserService.getActiveUserMenu(user.getId());
+			result.setData(lstModes);
+			String json = JSON.toJSONString(result);
+			ResponseUtil.write(response, json);
+		}catch(Exception e) {
+			log.error("获取权限菜单信息出错，错误信息：{}", e.getMessage());
+			e.printStackTrace();
+		}
 		
-		//缓存中不存在，重新查询
-		ResultJson result = new ResultJson();
-		List<MenuModel> lstModes = sysUserService.getActiveUserMenu(user.getId());
-		result.setData(lstModes);
-		String json = JSON.toJSONString(result);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
-		ResponseUtil.write(response, json);
 	}
 	
 }

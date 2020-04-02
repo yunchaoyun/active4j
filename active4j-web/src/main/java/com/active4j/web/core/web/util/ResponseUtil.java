@@ -23,6 +23,7 @@ public class ResponseUtil {
 	 * @param result
 	 */
 	public static void write(HttpServletResponse response, String result) {
+		response.setContentType("text/xml;charset=utf-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setHeader("Cache-Control", "no-store");
 		try {

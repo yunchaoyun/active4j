@@ -19,7 +19,7 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     ,name: 'active4j'
     ,tableName: 'layuiAdmin' //本地存储表名
     ,MOD_NAME: 'admin' //模块事件名
-    ,baseUrl:'http://localhost:9001/demo'
+    ,baseUrl:'http://localhost:9003/demo'
     ,uiUrl:'http://localhost:8080/ui'
     
     ,debug: true //是否开启调试模式。如开启，接口异常时会抛出异常 URL 等信息
