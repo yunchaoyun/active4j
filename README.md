@@ -18,8 +18,8 @@ Active4j-boot是基于SpingBoot2.0轻量级的java快速开发框架。以Spring
 # 技术文档
 - 讨论加群：qq群①：203802692   qq群②：773872959
 - 演示地址：[http://www.active4j.com:9003/demo](http://www.active4j.com:9003/demo "http://www.active4j.com:9003/demo")
-- 官方网站：[www.active4j.com](http://www.active.com "www.active4j.com")
-- 文档地址：[http://www.active4j.com/doc](http://www.active4j.com/doc "http://www.active4j.com/doc")
+- 官方网站：[www.active4j.com](http://www.active4j.com "www.active4j.com")
+- 文档地址：[http://www.active4j.com/doc.html](http://www.active4j.com/doc.html "http://www.active4j.com/doc.html")
 
 # 生态系统
 |  版本 |  地址 |
