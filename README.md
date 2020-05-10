@@ -25,7 +25,7 @@ Active4j-boot是基于SpingBoot2.0轻量级的java快速开发框架。以Spring
 |  版本 |  地址 |
 | ------------ | ------------ |
 |  前后端分离版本github |  [https://github.com/yunchaoyun/active4j](https://github.com/yunchaoyun/active4j "https://github.com/yunchaoyun/active4j") |
-| 前后端分离版本gitee  |  [https://gitee.com/active4j/active4j](https://gitee.com/active4j/active4j "https://gitee.com/active4j/active4j") |
+| 前后端分离版本gitee  |  [https://gitee.com/active4j/active4j-boot](https://gitee.com/active4j/active4j "https://gitee.com/active4j/active4j") |
 |  boot单体版本github | [https://github.com/yunchaoyun/active4j-boot](https://github.com/yunchaoyun/active4j-boot "https://github.com/yunchaoyun/active4j-boot")  |
 | boot单体版本gitee  | [https://gitee.com/active4j/active4j-boot](https://gitee.com/active4j/active4j-boot "https://gitee.com/active4j/active4j-boot") |
 |jsp版本github|[https://github.com/yunchaoyun/active4j-jsp](https://github.com/yunchaoyun/active4j-jsp "https://github.com/yunchaoyun/active4j-jsp")|
