@@ -73,9 +73,7 @@ public class SysUserController extends BaseController {
 		
 		//执行查询
 		IPage<SysUserEntity> lstResult = sysUserService.page(page.getPageEntity(), queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new UserWrapper(lstResult).wrap());
 	}
@@ -90,9 +88,7 @@ public class SysUserController extends BaseController {
 	@ApiOperation(value="获取角色信息", notes="根据用户ID获取角色信息", response=BaseWrapper.class)
 	public void roleByUserId(@ApiParam(name="userId", value="用户ID") String userId, HttpServletRequest request, HttpServletResponse response) {
 		SysUserEntity user = sysUserService.getById(userId);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != user && StringUtils.isNotEmpty(user.getDeptId())) {
 			//所属角色
 			List<SysRoleEntity> lstRoles = sysUserService.getUserRoles(user.getId());
@@ -277,9 +273,7 @@ public class SysUserController extends BaseController {
 		user.setDeptId(SystemUtils.getDeptNameById(user.getDeptId()));
 		//用户状态处理
 		user.setStatus(SystemUtils.getDictionaryValue("user_status", user.getStatus()));
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<SysUserEntity>(user).wrap());
 	}
@@ -368,9 +362,7 @@ public class SysUserController extends BaseController {
 	public void getName(HttpServletRequest request, HttpServletResponse response) {
 		//获取登录用户id
 		String name = ShiroUtils.getSessionUser().getRealName();
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<String>(name).wrap());
 	}

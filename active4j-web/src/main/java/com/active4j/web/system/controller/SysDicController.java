@@ -73,9 +73,7 @@ public class SysDicController extends BaseController {
 	@ApiOperation(value="获取字典", notes="获取数据字典配置值", response=BaseWrapper.class)
 	public void getDic(@ApiParam(name="parentId", value="数据字典ID", required=true) String parentId, HttpServletRequest request, HttpServletResponse response) {
 		SysDicEntity dic = sysDicService.getById(parentId);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new BaseWrapper<SysDicEntity>(dic).wrap());
 	}
 	
@@ -97,9 +95,7 @@ public class SysDicController extends BaseController {
 		List<SysDicEntity> lstResult = sysDicService.list(queryWrapper);
 		
 		List<TreeSysDicModel> lstModes = getDicTree(lstResult);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new DicWrapper(lstModes).wrap());
 		
 	}

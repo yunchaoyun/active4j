@@ -78,9 +78,7 @@ public class FuncSmsController extends BaseController {
 		model.setApiToken(apiToken);
 		model.setSmsSign(smsSign);
 		model.setTemplateNo(templateNo);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<YunchaoyunModel>(model).wrap());
 	} 
@@ -141,9 +139,7 @@ public class FuncSmsController extends BaseController {
 		model.setAppkey(appkey);
 		model.setSmsSign(smsSign);
 		model.setTemplateId(templateId);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<QcloudModel>(model).wrap());
 	} 
@@ -193,9 +189,7 @@ public class FuncSmsController extends BaseController {
 		model.setRegionId(aliSmsProperties.getRegionId());
 		model.setSmsSign("江苏众禾");
 		model.setTemplateCode("SMS_180046878");
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<AliModel>(model).wrap());
 	}

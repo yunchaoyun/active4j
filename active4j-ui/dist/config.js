@@ -19,8 +19,8 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     ,name: 'active4j'
     ,tableName: 'layuiAdmin' //本地存储表名
     ,MOD_NAME: 'admin' //模块事件名
-    ,baseUrl:'http://localhost:9003/demo'
-    ,uiUrl:'http://localhost:8080/ui'
+    ,baseUrl:'http://localhost:9004/demo'  //前后端分离的后端请求地址
+    ,uiUrl:'http://localhost:8080/active4j-ui'
     
     ,debug: true //是否开启调试模式。如开启，接口异常时会抛出异常 URL 等信息
     

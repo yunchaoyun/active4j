@@ -95,9 +95,7 @@ public class SysRoleController extends BaseController {
 				lstModes.add(model);
 			});
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new BaseWrapper<List<CheckTreeModel>>(lstModes).wrap());
 	}
 	
@@ -112,9 +110,7 @@ public class SysRoleController extends BaseController {
 	public void getRoleName(@ApiParam(name="id", value="角色ID") String id, HttpServletRequest request, HttpServletResponse response) {
 		//根据角色id获取角色
 		SysRoleEntity role = sysRoleService.getById(id);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != role) {
 			//结果处理,直接写到客户端
 			ResponseUtil.write(response, new BaseWrapper<SysRoleEntity>(role).wrap());
@@ -140,9 +136,7 @@ public class SysRoleController extends BaseController {
 		
 		//执行查询
 		List<SysRoleEntity> lstResult = sysRoleService.list(queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new RoleWrapper(lstResult).wrap());
 	}

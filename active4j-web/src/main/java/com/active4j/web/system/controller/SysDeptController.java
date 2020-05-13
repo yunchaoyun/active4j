@@ -80,9 +80,7 @@ public class SysDeptController extends BaseController {
 				lstModels.add(model);
 			}
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<List<ValueLabelModel>>(lstModels).wrap());
 	}
@@ -98,9 +96,7 @@ public class SysDeptController extends BaseController {
 	public void getDeptName(@ApiParam(name="id", value="部门ID") String id, HttpServletRequest request, HttpServletResponse response) {
 		//根据部门id获取部门
 		SysDepartEntity depart = sysDepartService.getById(id);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != depart) {
 			//结果处理,直接写到客户端
 			ResponseUtil.write(response, new BaseWrapper<SysDepartEntity>(depart).wrap());
@@ -121,9 +117,7 @@ public class SysDeptController extends BaseController {
 	@ApiOperation(value="获取用户部门", notes="根据用户ID,获取用户所在部门名称", response=BaseWrapper.class)
 	public void deptNameByUserId(@ApiParam(name="userId", value="用户ID") String userId, HttpServletRequest request, HttpServletResponse response) {
 		SysUserEntity user = sysUserService.getById(userId);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != user && StringUtils.isNotEmpty(user.getDeptId())) {
 			SysDepartEntity depart = sysDepartService.getById(user.getDeptId());
 			
@@ -150,9 +144,7 @@ public class SysDeptController extends BaseController {
 		
 		//执行查询
 		List<SysDepartEntity> lstResult = sysDepartService.list(queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new DeptWrapper(lstResult).wrap());
 	}

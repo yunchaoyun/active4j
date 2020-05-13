@@ -41,6 +41,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
 				HttpServletResponse resp = (HttpServletResponse)response;
 				try {
 					resp.setCharacterEncoding("UTF-8");
+					response.setContentType("application/json;charset=UTF-8");
 					resp.getWriter().write(JSON.toJSONString(j));
 				} catch (IOException e1) {
 					e1.printStackTrace();

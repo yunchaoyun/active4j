@@ -43,9 +43,7 @@ public class ServerMonitorController extends BaseController {
 		
 		//获取服务器信息
 		ServerInfoModel server = serverMonitorService.getServer();
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != server) {
 			//结果处理,直接写到客户端
 			ResponseUtil.write(response, new BaseWrapper<ServerInfoModel>(server).wrap());

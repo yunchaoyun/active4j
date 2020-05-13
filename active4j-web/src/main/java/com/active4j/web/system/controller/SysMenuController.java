@@ -82,9 +82,7 @@ public class SysMenuController extends BaseController {
 				lstModels.add(model);
 			}
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<List<ValueLabelModel>>(lstModels).wrap());
 	}
@@ -100,9 +98,7 @@ public class SysMenuController extends BaseController {
 	public void menuName(@ApiParam(name="id", value="菜单ID") String id, HttpServletRequest request, HttpServletResponse response) {
 		//根据id获取目录
 		SysMenuEntity menu = sysMenuService.getById(id);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		if(null != menu) {
 			//结果处理,直接写到客户端
 			ResponseUtil.write(response, new BaseWrapper<SysMenuEntity>(menu).wrap());
@@ -128,9 +124,7 @@ public class SysMenuController extends BaseController {
 		
 		//执行查询
 		List<SysMenuEntity> lstResult = sysMenuService.list(queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new MenuWrapper(lstResult).wrap());
 	}

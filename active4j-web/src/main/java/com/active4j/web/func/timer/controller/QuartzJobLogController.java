@@ -77,9 +77,7 @@ public class QuartzJobLogController extends BaseController {
 				lstModels.add(model);
 			}
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<List<ValueLabelModel>>(lstModels).wrap());
 	}
@@ -99,9 +97,6 @@ public class QuartzJobLogController extends BaseController {
 	public void detail(String id, HttpServletRequest request, HttpServletResponse response) {
 		//获取任务明细
 		QuartzJobLogModel model = quartzJobLogService.getLogDetailModel(id);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<QuartzJobLogModel>(model).wrap());
 	}
@@ -123,9 +118,6 @@ public class QuartzJobLogController extends BaseController {
 		QueryWrapper<QuartzJobLogEntity> queryWrapper = QueryUtils.installQueryWrapper(quartzJobLogEntity, request.getParameterMap());
 		//执行查询
 		IPage<QuartzJobLogEntity> lstResult = quartzJobLogService.page(page.getPageEntity(), queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
 		//结果处理，直接写到客户端
 		ResponseUtil.write(response, new QuartzJobLogWrapper(lstResult).wrap());
 	}

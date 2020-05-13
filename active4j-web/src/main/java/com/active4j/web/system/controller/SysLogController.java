@@ -63,9 +63,7 @@ public class SysLogController extends BaseController {
 		
 		//执行查询
 		IPage<SysLogEntity> lstResult = sysLogService.page(page.getPageEntity(), queryWrapper);
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new LogWrapper(lstResult).wrap());
 	}
@@ -92,9 +90,7 @@ public class SysLogController extends BaseController {
 				lstModels.add(model);
 			}
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<List<ValueLabelModel>>(lstModels).wrap());
 	}

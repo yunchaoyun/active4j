@@ -71,9 +71,6 @@ public class CommonController extends BaseController {
 				lstModels.add(model);
 			}
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
 		//结果处理,直接写到客户端
 		ResponseUtil.write(response, new BaseWrapper<List<ValueLabelModel>>(lstModels).wrap());
 	}
@@ -99,9 +96,7 @@ public class CommonController extends BaseController {
 				lstModes.add(model);
 			});
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+		
 		ResponseUtil.write(response, new BaseWrapper<List<TreeModel>>(lstModes).wrap());
 	}
 	
@@ -126,9 +121,7 @@ public class CommonController extends BaseController {
 				lstModes.add(model);
 			});
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new BaseWrapper<List<TreeModel>>(lstModes).wrap());
 	}
 	
@@ -153,9 +146,7 @@ public class CommonController extends BaseController {
 				lstModes.add(model);
 			});
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new BaseWrapper<List<TreeModel>>(lstModes).wrap());
 	}
 	
@@ -184,9 +175,7 @@ public class CommonController extends BaseController {
 				lstModes.add(model);
 			});
 		}
-		//防止中文乱码
-		response.setContentType("text/xml;charset=utf-8");
-		response.setCharacterEncoding("utf-8");
+
 		ResponseUtil.write(response, new BaseWrapper<List<CheckTreeModel>>(lstModes).wrap());
 	}
 	
