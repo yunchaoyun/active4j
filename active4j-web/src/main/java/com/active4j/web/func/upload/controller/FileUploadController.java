@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,7 +70,7 @@ public class FileUploadController extends BaseController {
 	/**
 	 * 上传的组合路径
 	 */
-	private final String uploadPath = "Uploads/";
+	private final String uploadPath = "\\Uploads\\";
 	
 	private static long cacheTime = 10 * 60l * 60l * 1000l;
 	
@@ -102,8 +100,8 @@ public class FileUploadController extends BaseController {
 				String extName = FileUploadUtils.getExtension(mf);
 				//uuid创建文件名
 				String fileName = UUIDUtil.getUUID() + "." + extName;
-				//获取项目根目录（防止空格）
-				String filePath = URLDecoder.decode(ResourceUtils.getURL("classpath:").getPath(), "utf-8");
+				//获取项目根目录
+				String filePath = System.getProperty("user.dir");
 				//获得文件输入流
 				InputStream inputStream = mf.getInputStream();
 				//保存文件
@@ -112,7 +110,9 @@ public class FileUploadController extends BaseController {
                 	f.getParentFile().mkdirs();
                 	FileCopyUtils.copy(inputStream, new FileOutputStream(f));//把文件写入磁盘
                 }
-                key = filePath + uploadPath + DateUtils.getDateYYYY_MM_DD() + "/" + fileName;
+                String tmpKey = filePath + uploadPath + DateUtils.getDateYYYY_MM_DD() + "\\" + fileName;
+                //替换"\"
+                key = tmpKey.replace("\\", "/");
                 log.info("创建本地文件：{}", key);
                 //关闭流
                 inputStream.close();
