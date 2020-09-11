@@ -18,7 +18,6 @@ import com.active4j.entity.base.annotation.Log;
 import com.active4j.entity.base.model.AccessTokenModel;
 import com.active4j.entity.base.model.LogType;
 import com.active4j.entity.base.model.ResultJson;
-import com.active4j.entity.common.GlobalConstant;
 import com.active4j.entity.system.entity.SysUserEntity;
 import com.active4j.service.system.service.SysUserService;
 import com.active4j.web.core.config.shiro.ShiroUtils;
@@ -84,7 +83,8 @@ public class LoginController {
 	@ApiOperation(value = "用户登录", notes = "用户登录")
 	@ResponseBody
 	@Log(type = LogType.login, name = "用户登录", memo = "用户成功登录")
-	public ResultJson loginAction(@ApiParam(name="username", value="用户名", required=true) String username, @ApiParam(name="password", value="密码", required=true) String password, @ApiParam(name="vercode", value="验证码", required=true) String vercode) {
+	public ResultJson loginAction(@ApiParam(name="username", value="用户名", required=true) String username, @ApiParam(name="password", value="密码", required=true) String password, 
+			@ApiParam(name="vercode", value="验证码", required=true) String vercode, HttpServletRequest request) {
 		ResultJson j = new ResultJson();
 		
 		try {
@@ -107,8 +107,10 @@ public class LoginController {
 				return j;
 			}
 
-			//从redis中获取验证码
-			String serverVercode = (String) redisApi.get(GlobalConstant.SESSION_KEY_OF_RAND_CODE);
+			//从redis中获取验证码，可选，需要在图片验证码保存时使用redis
+//			String serverVercode = (String) redisApi.get(GlobalConstant.SESSION_KEY_OF_RAND_CODE + ":" + request.getSession().getId());
+			//从session中获取验证码
+			String serverVercode = (String) request.getSession().getAttribute(request.getSession().getId());
 			
 			// 验证码的校验
 			if (!StringUtils.equalsIgnoreCase(vercode, serverVercode)) {

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.active4j.common.redis.RedisApi;
-import com.active4j.entity.common.GlobalConstant;
 import com.active4j.web.core.config.properties.VerCodeProperties;
 
 /**
@@ -65,6 +64,8 @@ public class VerCodeController implements Serializable{
 	 */
 	@RequestMapping("/vercode")
 	public void verCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//解决跨域问题
+		response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 		// 设置页面不缓存
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");
@@ -111,8 +112,10 @@ public class VerCodeController implements Serializable{
 			graphics.drawString(String.valueOf(resultCode.charAt(i)), (23 * i) + 8, 26);
 		}
 
+		//验证码存入redis，可选
+//		redisApi.set(GlobalConstant.SESSION_KEY_OF_RAND_CODE + ":" + request.getSession().getId(), resultCode);
 		// 将认证码存入SESSION
-		redisApi.set(GlobalConstant.SESSION_KEY_OF_RAND_CODE, resultCode);
+		request.getSession().setAttribute(request.getSession().getId(), resultCode);
 		
 		// 图象生效
 		graphics.dispose();
