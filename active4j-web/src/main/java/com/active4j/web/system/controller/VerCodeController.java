@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.active4j.common.redis.RedisApi;
 import com.active4j.web.core.config.properties.VerCodeProperties;
+import com.active4j.web.core.config.shiro.ShiroUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 登录验证码生成
@@ -24,6 +27,7 @@ import com.active4j.web.core.config.properties.VerCodeProperties;
  * @author teli_
  *
  */
+@Slf4j
 @Controller
 public class VerCodeController implements Serializable{
 	
@@ -64,8 +68,7 @@ public class VerCodeController implements Serializable{
 	 */
 	@RequestMapping("/vercode")
 	public void verCode(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		//解决跨域问题
-		response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+		
 		// 设置页面不缓存
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");

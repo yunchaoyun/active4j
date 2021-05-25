@@ -1,6 +1,7 @@
 package com.active4j.web.system.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -26,6 +27,7 @@ import com.active4j.web.core.jwt.JwtUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -36,6 +38,7 @@ import io.swagger.annotations.ApiParam;
  * @author guyp
  * @version 1.0
  */
+@Slf4j
 @Controller
 @Api(value="用户登录登出", tags={"用户登录登出操作接口"})
 public class LoginController {
@@ -84,7 +87,7 @@ public class LoginController {
 	@ResponseBody
 	@Log(type = LogType.login, name = "用户登录", memo = "用户成功登录")
 	public ResultJson loginAction(@ApiParam(name="username", value="用户名", required=true) String username, @ApiParam(name="password", value="密码", required=true) String password, 
-			@ApiParam(name="vercode", value="验证码", required=true) String vercode, HttpServletRequest request) {
+			@ApiParam(name="vercode", value="验证码", required=true) String vercode, HttpServletRequest request, HttpServletResponse response) {
 		ResultJson j = new ResultJson();
 		
 		try {
