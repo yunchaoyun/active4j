@@ -94,6 +94,10 @@ layui.use(['admin', 'form', 'user'], function(){
       url: setter.baseUrl + '/login' //实际使用请改成服务端真实接口
       ,data: obj.field
       ,type: "POST"
+      //跨域请求
+      ,xhrFields: {
+          withCredentials: true
+       }
       ,done:function(res) {
       	if(res.success) {
       		 //请求成功后，写入 access_token
@@ -116,9 +120,6 @@ layui.use(['admin', 'form', 'user'], function(){
       	}
       
       }
-      ,xhrFields: {
-	  	withCredentials: true
-	  }
     });
     
   });
